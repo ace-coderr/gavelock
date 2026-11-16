@@ -12,8 +12,8 @@ Updated 16 November 2026. To resume in a new session: read this file and `docs/P
 | # | Task | State |
 |---|---|---|
 | 0 | Protocol spike, cost table | Done. Gate A approved 16 November. |
-| 1 | Monorepo scaffold + GitHub Pages deploy | **In progress** |
-| 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | Not started (a spike-grade compiler exists in `spike/scripts/lib/rules.mjs`) |
+| 1 | Monorepo scaffold + GitHub Pages deploy | Done 16 November. |
+| 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | **In progress** |
 | 3 | Contracts + tests on an X Layer fork | Not started |
 | 4 | Web app | Not started |
 | 5 | MCP package | Not started |
@@ -22,11 +22,9 @@ Updated 16 November 2026. To resume in a new session: read this file and `docs/P
 | 8 | DeWEB dry run, Gate C | Not started |
 | 9 | README + docs/SUBMISSION.md | Not started |
 
-### Task 1 progress
+## Live site
 
-- Done: root npm workspaces (`packages/*`, `web`), `packages/core` (chain constants, drand round arithmetic, 4 passing tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, 5 passing fork smoke tests via `npm run test:fork`).
-- Left: `web/` shell (React + Vite + TS, hash routing, navbar and footer, one design-token layer, fonts bundled locally, Tender Board with an honest empty state, footer "Built by" + `ace` pill), `.github/workflows` Pages deploy (build `web/`, deploy on push to main), set the Pages source to GitHub Actions (the Pages site does not exist yet: `gh api repos/ace-coderr/gavelock/pages` returns 404), confirm the live URL.
-- `packages/mcp` is created in Task 5, not before.
+https://ace-coderr.github.io/gavelock/ is deployed by `.github/workflows/deploy.yml` on every push to main (Pages source: GitHub Actions). The workflow typechecks, runs unit tests, builds `web/` and fails if the build references another origin.
 
 ## Gates
 
@@ -44,6 +42,8 @@ Approved as written: block numbers on every record, bid ciphertexts as contract 
 
 ## What exists
 
+- Root npm workspaces: `packages/core` (chain constants, deployment record, drand round arithmetic), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.
+- Commands: `npm run typecheck`, `npm test`, `npm run build`, `npm run dev`, `npm run test:fork`.
 - `spike/`: read-only mainnet checks, a Hardhat fork cost script, a probe contract, the tlock checks. Raw results in `spike/out/`. Standalone, not part of the workspaces.
 - `docs/PROTOCOL.md`: verified addresses, interfaces, limits, costs, trust boundaries, plan changes.
 
