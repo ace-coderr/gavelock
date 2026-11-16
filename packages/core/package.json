@@ -1,0 +1,19 @@
+{
+  "name": "@gavelock/core",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Shared Gavelock logic: chain constants, drand round arithmetic, and (from Task 2) bid encoding, banding, the rule compiler and time-lock sealing.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^5.1.0"
+  }
+}

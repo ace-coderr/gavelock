@@ -1,0 +1,24 @@
+{
+  "name": "@gavelock/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Gavelock contracts and their tests against a fork of X Layer mainnet.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:fork": "hardhat test nodejs"
+  },
+  "dependencies": {
+    "@gavelock/core": "*"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-node-test-runner": "^3.1.2",
+    "@nomicfoundation/hardhat-viem": "^3.1.0",
+    "@types/node": "^22.0.0",
+    "hardhat": "^3.22.0",
+    "typescript": "~5.9.3",
+    "viem": "^2.57.20"
+  }
+}

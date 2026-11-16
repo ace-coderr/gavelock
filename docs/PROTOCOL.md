@@ -216,10 +216,11 @@ in the bidder and panel wallets.
 - drand quicknet: a bid is sealed until the League of Entropy publishes the round. If the network halted, bids could not be opened; they would be void and deposits handled by the tender's own rules.
 - After opening, bids are public.
 
-## 9. Proposed changes to the plan
+## 9. Changes to the plan (decided at Gate A, 16 November 2026)
 
-1. **Buy BEM before Gate B.** The deploy wallet needs 0.15 BEM. Swapping is a trade, so it is yours to do: the BEM / WOKB pool above is where it trades.
-2. **Custom rules without BEM.** A buyer taping out a rule needs NAND transistors, and minting them now needs BEM. Proposal: a small contract with no owner holds a stock of pre-minted NAND and performs the tape-out for the caller, who pays the 0.0013 OKB and receives the circuit. One extra mint call (0.01 BEM) fills the stock. To be proven on the fork in Task 3.
-3. **Records carry their block number**, so tx hashes and document bytes are recoverable one block at a time.
-4. **Ciphertexts as contract code, documents in events**, as measured in section 5.
-5. **Paged `finalize()`** and a 1,500-NAND cap in the rule builder.
+1. **BEM.** The deploy wallet needs BEM for the processor and the mint. It is bought by the owner at Gate B, not before. At Gate B the live fees are read again and the exact pool and amount are stated.
+2. **Stock contract for custom rules.** A contract with no owner creates the Gavelock processor with mint price 0 and mints the **entire** transistor supply to itself in the same transaction, so nobody else can ever mint or exhaust it. The supply is in the millions, so draining it with junk tape-outs is impractical. A caller taping out a rule pays the 0.0013 OKB tape-out fee plus a small custom-rule fee in OKB that goes to Gavelock's fee address, and ends up owning the circuit. All of this must be proven on the fork in Task 3; if it cannot be, work stops and the owner is told.
+3. **Records carry their block number**, so tx hashes are recoverable one block at a time.
+4. **Ciphertexts and documents as contract code.** Document bytes are stored as contract code as well as announced in an event, provided the measured cost stays under 0.001 OKB per 100 KB (first estimate: about 0.0005 OKB). The Audit Pack must not depend on a node keeping old logs. The SHA-256 stays on chain either way.
+5. **Paged `finalize()`.** Anyone can call any page. The award must be identical for every page size and every caller, ties resolve the same way, and the recompute after an upheld challenge uses the same paged path. Tests cover each of these.
+6. **1,500-NAND cap** in the rule builder.
