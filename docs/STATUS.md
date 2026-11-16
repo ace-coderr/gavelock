@@ -13,8 +13,8 @@ Updated 16 November 2026. To resume in a new session: read this file and `docs/P
 |---|---|---|
 | 0 | Protocol spike, cost table | Done. Gate A approved 16 November. |
 | 1 | Monorepo scaffold + GitHub Pages deploy | Done 16 November. |
-| 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | **In progress** |
-| 3 | Contracts + tests on an X Layer fork | Not started |
+| 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | Done 16 November. |
+| 3 | Contracts + tests on an X Layer fork | **Next** |
 | 4 | Web app | Not started |
 | 5 | MCP package | Not started |
 | 6 | Audit pass | Not started |
@@ -40,9 +40,25 @@ https://ace-coderr.github.io/gavelock/ is deployed by `.github/workflows/deploy.
 
 Approved as written: block numbers on every record, bid ciphertexts as contract code, the 1,500-NAND cap in the rule builder.
 
+## Decisions made in Task 2 (the contract must match these exactly)
+
+The TypeScript in  is the specification; contract tests compare the two.
+
+- **Rule input, 11 bits:** price band (bits 0-2), delivery band (3-4), mandatory (5), preferred A (6), preferred B (7), panel band (8-10). **Output, 5 bits:** eligible (0), score 0-15 (1-4).  takes 2 bytes and returns 1.
+- **Sealed plaintext:** . Note at most 280 UTF-8 bytes. Price from 1 to 2^128-1.
+- **Commitment:** . Binding the bidder means a copied commitment can never be opened.
+- **Lowest valid price:** lowest price among opened, non-disqualified bids that claim every mandatory item. A non-compliant lowball cannot shift everyone else's price band.
+- **Price band:** number of the 7 ladder steps (basis points) with . Band 7 when there is no valid price. Default ladder 0, 250, 500, 1000, 1500, 2500, 4000.
+- **Delivery band:** number of the 3 ladder steps (days) the delivery time exceeds. Default 7, 14, 30.
+- **Checklist:** up to 32 items; three disjoint masks (mandatory, preferred A, preferred B). A group is earned only by claiming all of it; an empty preferred group is never earned; an empty mandatory group is always met.
+- **Panel:** scores 0-100; median of revealed scores, even count = mean of the two middle scores rounded down; band = floor(median * 8 / 101). Quick Quote uses band 0.
+- **Ranking:** higher score, then lower price, then lower bid index. A total order, so the winner is independent of processing order (the basis for paged finalize).
+- **Starter rules** (form weights, no gates): lowest price = price 100 (15 NAND); price 60 / quality 40 (141 NAND); quality 70 / price 30 (133 NAND); fastest delivery = delivery 100 (12 NAND). Score = round-half-up of 15 * weighted fraction, integer arithmetic.
+- **Sealing:** . Sealing is offline; opening fetches one drand round and verifies its signature. The ciphertext on chain is the binary age payload (583 bytes for a short note, about 810 for a 240-character note).
+
 ## What exists
 
-- Root npm workspaces: `packages/core` (chain constants, deployment record, drand round arithmetic), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.
+- Root npm workspaces: `packages/core` (chain constants, deployment record, drand rounds, rule layout / form / NAND compiler / netlist codec and simulator, bid encoding and commitment, banding, reference award, time-lock sealing; 60 tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.
 - Commands: `npm run typecheck`, `npm test`, `npm run build`, `npm run dev`, `npm run test:fork`.
 - `spike/`: read-only mainnet checks, a Hardhat fork cost script, a probe contract, the tlock checks. Raw results in `spike/out/`. Standalone, not part of the workspaces.
 - `docs/PROTOCOL.md`: verified addresses, interfaces, limits, costs, trust boundaries, plan changes.
