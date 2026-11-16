@@ -1,0 +1,55 @@
+{
+  "ownership": [
+    {
+      "block": 76049641,
+      "factory.owner": "0xB3D85b42A045c1A88D800CAD0F55d2566a4D3138",
+      "circuitBeacon.owner": "0x0000000000000000000000000000000000000000",
+      "transistorBeaconOld.owner": "0x0000000000000000000000000000000000000000",
+      "transistorBeaconNew.owner": "0x0000000000000000000000000000000000000000",
+      "circuitImpl": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2"
+    },
+    {
+      "block": 75049641,
+      "factory.owner": "0xB3D85b42A045c1A88D800CAD0F55d2566a4D3138",
+      "circuitBeacon.owner": "0x0000000000000000000000000000000000000000",
+      "transistorBeaconOld.owner": "0x0000000000000000000000000000000000000000",
+      "transistorBeaconNew.owner": "error: The contract function \"owner\" returned no data (\"0x\").",
+      "circuitImpl": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2"
+    },
+    {
+      "block": 73049641,
+      "factory.owner": "0xB3D85b42A045c1A88D800CAD0F55d2566a4D3138",
+      "circuitBeacon.owner": "0x1f09DAeFA827f02CBb40967cc91b259763760761",
+      "transistorBeaconOld.owner": "0x1f09DAeFA827f02CBb40967cc91b259763760761",
+      "transistorBeaconNew.owner": "error: The contract function \"owner\" returned no data (\"0x\").",
+      "circuitImpl": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2"
+    },
+    {
+      "block": 71549641,
+      "factory.owner": "0x571d447f4f24688eC35Ccf07f1D6993655F6aF15",
+      "circuitBeacon.owner": "0x1f09DAeFA827f02CBb40967cc91b259763760761",
+      "transistorBeaconOld.owner": "0x1f09DAeFA827f02CBb40967cc91b259763760761",
+      "transistorBeaconNew.owner": "error: The contract function \"owner\" returned no data (\"0x\").",
+      "circuitImpl": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2"
+    },
+    {
+      "block": 71049641,
+      "factory.owner": "0x571d447f4f24688eC35Ccf07f1D6993655F6aF15",
+      "circuitBeacon.owner": "0x1f09DAeFA827f02CBb40967cc91b259763760761",
+      "transistorBeaconOld.owner": "0x1f09DAeFA827f02CBb40967cc91b259763760761",
+      "transistorBeaconNew.owner": "error: The contract function \"owner\" returned no data (\"0x\").",
+      "circuitImpl": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2"
+    }
+  ],
+  "factorySealed": false,
+  "newBeaconCodeEqualsOld": false,
+  "txGas16000000": "ok gasUsed 21000",
+  "txGas17000000": "ok gasUsed 21000",
+  "txGas30000000": "ok gasUsed 21000",
+  "txGas100000000": "ok gasUsed 21000",
+  "txGas200000000": "ok gasUsed 21000",
+  "largestRecentGasLimit": {
+    "gas": "12000000",
+    "tx": "0x3a0d1154986ca22e0da338fb59142fa420dccc4e54a6f8e2c20ee8a54931e0b9"
+  }
+}

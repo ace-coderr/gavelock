@@ -1,0 +1,50 @@
+[
+  {
+    "key": "lowestPrice",
+    "name": "Lowest compliant price",
+    "gates": 15,
+    "netlistBytes": 105,
+    "equivalent": true,
+    "order": "0 1 2 3 4 5 6 7 8 9 10"
+  },
+  {
+    "key": "price60quality40",
+    "name": "Price 60 / Quality 40",
+    "gates": 141,
+    "netlistBytes": 987,
+    "equivalent": true,
+    "order": "3 4 5 0 1 2 6 7 8 9 10"
+  },
+  {
+    "key": "quality70price30",
+    "name": "Quality 70 / Price 30",
+    "gates": 129,
+    "netlistBytes": 903,
+    "equivalent": true,
+    "order": "4 3 5 7 6 10 9 8 2 1 0"
+  },
+  {
+    "key": "fastestDelivery",
+    "name": "Fastest compliant delivery",
+    "gates": 75,
+    "netlistBytes": 525,
+    "equivalent": true,
+    "order": "5 4 3 2 1 0 7 6 10 9 8"
+  },
+  {
+    "key": "customAllInputs",
+    "name": "Custom: every input weighted",
+    "gates": 576,
+    "netlistBytes": 4032,
+    "equivalent": true,
+    "order": "5 7 6 2 1 0 4 3 10 9 8"
+  },
+  {
+    "key": "random",
+    "name": "Worst case: random 11-in / 5-out table",
+    "gates": 3296,
+    "netlistBytes": 23072,
+    "equivalent": true,
+    "order": "4 3 5 10 9 8 2 1 0 7 6"
+  }
+]

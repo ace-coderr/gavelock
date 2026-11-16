@@ -1,0 +1,11 @@
+{
+  "note": "Output of scripts/browser/tlock-browser.mjs, bundled with esbuild and opened from http://127.0.0.1:4173 on 2026-11-16.",
+  "userAgent": "Chromium 156 (desktop, Windows)",
+  "steps": [
+    { "name": "chain info fetched from the browser", "value": { "hash": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971", "period": 3 } },
+    { "name": "sealed", "value": { "round": 34005057, "ms": 139, "armoredChars": 1161 } },
+    { "name": "open before the round", "value": "refused: It's too early to decrypt the ciphertext - decryptable at round 34005057" },
+    { "name": "open after the round", "value": { "matches": true, "ms": 501 } }
+  ],
+  "ok": true
+}

@@ -1,0 +1,460 @@
+{
+  "rpc": "https://rpc.xlayer.tech",
+  "checks": [
+    {
+      "name": "chainId",
+      "value": 196,
+      "ok": true
+    },
+    {
+      "name": "block",
+      "value": 76047794,
+      "ok": true
+    },
+    {
+      "name": "blockTime",
+      "value": "2026-11-16T08:13:50.000Z",
+      "ok": true
+    },
+    {
+      "name": "blockGasLimit",
+      "value": "210000000",
+      "ok": true
+    },
+    {
+      "name": "gasPrice(wei)",
+      "value": "20000001",
+      "ok": true
+    },
+    {
+      "name": "baseFeePerGas(wei)",
+      "value": "20000000",
+      "ok": true
+    },
+    {
+      "name": "factory.codeSize",
+      "value": 130,
+      "ok": true
+    },
+    {
+      "name": "factory.impl(ERC1967)",
+      "value": "0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a",
+      "ok": true
+    },
+    {
+      "name": "factory.owner",
+      "value": "0xB3D85b42A045c1A88D800CAD0F55d2566a4D3138",
+      "ok": true
+    },
+    {
+      "name": "factory.isSealed",
+      "value": false,
+      "ok": true
+    },
+    {
+      "name": "factory.deployFee(OKB)",
+      "value": "0.00000000001",
+      "ok": true
+    },
+    {
+      "name": "factory.protocolFee(OKB)",
+      "value": "0.000000000001",
+      "ok": true
+    },
+    {
+      "name": "factory.cpuCount",
+      "value": "424",
+      "ok": true
+    },
+    {
+      "name": "factory.circuitBeacon",
+      "value": "0xf70d1ed4f62CF3780157B0b421b7E2F45bD0991C",
+      "ok": true
+    },
+    {
+      "name": "circuitBeacon.implementation",
+      "value": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2",
+      "ok": true
+    },
+    {
+      "name": "circuitBeacon.owner",
+      "value": "0x0000000000000000000000000000000000000000",
+      "ok": true
+    },
+    {
+      "name": "factory.transistorBeacon",
+      "value": "0x1059Ad62cAbB6a6925bb65aA617300556c60A51B",
+      "ok": true
+    },
+    {
+      "name": "transistorBeacon.implementation",
+      "value": "0x265bf10faB9ddEC0eE0A649C6B9DB845f1b9a06b",
+      "ok": true
+    },
+    {
+      "name": "factory.protocolWallet",
+      "value": "0x571d447f4f24688eC35Ccf07f1D6993655F6aF15",
+      "ok": true
+    },
+    {
+      "name": "selector createCPU",
+      "value": "0x47f9b5fd",
+      "ok": true
+    },
+    {
+      "name": "selector tapeout",
+      "value": "0x7bd3ac1d",
+      "ok": true
+    },
+    {
+      "name": "selector eval",
+      "value": "0x934d06ea",
+      "ok": true
+    },
+    {
+      "name": "selector mint",
+      "value": "0x1b2ef1ca",
+      "ok": true
+    },
+    {
+      "name": "createCPU selector in factory impl",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has tapeout(bytes,uint32,uint32)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has eval(uint256,bytes)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has step(uint256,bytes,bytes)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has netlist(uint256)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has circuitInfo(uint256)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has nextId()",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl has TAPEOUT_FEE()",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "circuits impl codehash",
+      "value": "0x7a15c353205e5245f40f5f5524542a982a4bb3b9a28476e4f10845163f941b30",
+      "ok": true
+    },
+    {
+      "name": "transistors impl has mint(uint256,uint256)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "transistors impl has mintPrice()",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "transistors impl has supplyCap()",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "transistors impl has minted()",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "transistors impl has withdraw()",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "transistors impl has owed(address)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "sample72.isCPU",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "sample72.name",
+      "value": "RuleChip",
+      "ok": true
+    },
+    {
+      "name": "sample72.circuitInfo(nIn,nOut,nState,gates)",
+      "value": [
+        8,
+        7,
+        0,
+        374
+      ],
+      "ok": true
+    },
+    {
+      "name": "sample72.netlist bytes",
+      "value": 2618,
+      "ok": true
+    },
+    {
+      "name": "sample72.eval(0x87)",
+      "value": "0x00",
+      "ok": true
+    },
+    {
+      "name": "sample72.eval gas (incl. 21k base)",
+      "value": "907682",
+      "ok": true
+    },
+    {
+      "name": "sample70.isCPU",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "sample70.name",
+      "value": "RuleChip",
+      "ok": true
+    },
+    {
+      "name": "sample70.circuitInfo(nIn,nOut,nState,gates)",
+      "value": [
+        8,
+        7,
+        0,
+        364
+      ],
+      "ok": true
+    },
+    {
+      "name": "sample70.netlist bytes",
+      "value": 2548,
+      "ok": true
+    },
+    {
+      "name": "sample70.eval(0x87)",
+      "value": "0x40",
+      "ok": true
+    },
+    {
+      "name": "sample70.eval gas (incl. 21k base)",
+      "value": "885123",
+      "ok": true
+    },
+    {
+      "name": "sample40.isCPU",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "sample40.name",
+      "value": "OpenGate",
+      "ok": true
+    },
+    {
+      "name": "sample40.circuitInfo(nIn,nOut,nState,gates)",
+      "value": [
+        6,
+        3,
+        0,
+        40
+      ],
+      "ok": true
+    },
+    {
+      "name": "sample40.netlist bytes",
+      "value": 280,
+      "ok": true
+    },
+    {
+      "name": "sample40.eval(0x00)",
+      "value": "0x00",
+      "ok": true
+    },
+    {
+      "name": "sample40.eval gas (incl. 21k base)",
+      "value": "139762",
+      "ok": true
+    },
+    {
+      "name": "circuits.TAPEOUT_FEE(OKB)",
+      "value": "0.0013",
+      "ok": true
+    },
+    {
+      "name": "circuits.TREASURY",
+      "value": "0xEBeceDeA36e598b64E17f8d519EB77441C539F76",
+      "ok": true
+    },
+    {
+      "name": "circuits.nextId (= last id)",
+      "value": "4",
+      "ok": true
+    },
+    {
+      "name": "transistors",
+      "value": "0xF8192924a95754EfCA2Ba850DD79c2CF488A0D3c",
+      "ok": true
+    },
+    {
+      "name": "transistors.NAND id",
+      "value": "0",
+      "ok": true
+    },
+    {
+      "name": "transistors.LATCH id",
+      "value": "1",
+      "ok": true
+    },
+    {
+      "name": "transistors.mintPrice(OKB)",
+      "value": "0.000000066",
+      "ok": true
+    },
+    {
+      "name": "transistors.protocolFee(OKB)",
+      "value": "0.00066",
+      "ok": true
+    },
+    {
+      "name": "transistors.supplyCap",
+      "value": "1000000",
+      "ok": true
+    },
+    {
+      "name": "transistors.minted",
+      "value": "481103",
+      "ok": true
+    },
+    {
+      "name": "eval with empty input (reads as zeros)",
+      "value": "0x38",
+      "ok": true
+    },
+    {
+      "name": "eval with extra bytes (ignored)",
+      "value": "0x00",
+      "ok": true
+    },
+    {
+      "name": "eval of missing circuit",
+      "value": "revert: The contract function \"eval\" reverted with the following reason:",
+      "ok": true
+    },
+    {
+      "name": "multicall3 -> eval x16 (contract caller)",
+      "value": true,
+      "ok": true
+    },
+    {
+      "name": "opener.codeSize",
+      "value": 2604,
+      "ok": true
+    },
+    {
+      "name": "opener.FEE(OKB)",
+      "value": "0.08",
+      "ok": true
+    },
+    {
+      "name": "siteRegistry.codeSize",
+      "value": 176,
+      "ok": true
+    },
+    {
+      "name": "siteRegistry.impl",
+      "value": "0xa85c4143d1d4a77f54b8e4ecc9e6d1418afea45f",
+      "ok": true
+    },
+    {
+      "name": "domainBinding.codeSize",
+      "value": 176,
+      "ok": true
+    },
+    {
+      "name": "domainBinding.impl",
+      "value": "0x5ebf29b80789e548907c707530c3c7607c4347df",
+      "ok": true
+    },
+    {
+      "name": "domainBinding.monthlyFee(OKB)",
+      "value": "0",
+      "ok": true
+    },
+    {
+      "name": "eth_getLogs over 100 blocks",
+      "value": "0 logs",
+      "ok": true
+    },
+    {
+      "name": "eth_getLogs over 1000 blocks",
+      "value": "error: Invalid parameters were provided to the RPC method.",
+      "ok": true
+    },
+    {
+      "name": "eth_getLogs over 10000 blocks",
+      "value": "error: Invalid parameters were provided to the RPC method.",
+      "ok": true
+    },
+    {
+      "name": "eth_simulateV1 on rpc.xlayer.tech",
+      "value": "error: The method \"eth_simulateV1\" does not exist / is not available.",
+      "ok": true
+    },
+    {
+      "name": "eth_call with state override (balance)",
+      "value": "0x00000000000000000000000000000000000000000000000000000000000001a8",
+      "ok": true
+    },
+    {
+      "name": "historical state (head-2000) available",
+      "value": "424",
+      "ok": true
+    },
+    {
+      "name": "historical state (head-200000) available",
+      "value": "418",
+      "ok": true
+    }
+  ],
+  "block": 76047794,
+  "gasPrice": "20000001",
+  "sample72": {
+    "gates": 374,
+    "nIn": 8,
+    "nOut": 7,
+    "evalGas": "907682"
+  },
+  "sample70": {
+    "gates": 364,
+    "nIn": 8,
+    "nOut": 7,
+    "evalGas": "885123"
+  },
+  "sample40": {
+    "gates": 40,
+    "nIn": 6,
+    "nOut": 3,
+    "evalGas": "139762"
+  }
+}

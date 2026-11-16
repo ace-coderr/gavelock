@@ -1,0 +1,137 @@
+{
+  "circuits": {
+    "proxy": "0x0f096F9669b082Df098Db16157Aeb848BD59d504",
+    "proxyCodeBytes": 295,
+    "beaconSlot": "0xf70d1ed4f62cf3780157b0b421b7e2f45bd0991c",
+    "implSlot": "0x0000000000000000000000000000000000000000",
+    "embedded": [
+      "0xd5ff35b3d5ffdfea2646970667358221220c2e82"
+    ],
+    "beacon": "0xf70d1ed4f62cf3780157b0b421b7e2f45bd0991c",
+    "beaconOwner": "0x0000000000000000000000000000000000000000",
+    "impl": "0x977f217887E085D298Cb3819cDAD5A0ee35F29B2",
+    "implCodeBytes": 12562,
+    "has": [
+      "factory()",
+      "burnFrom(address,uint256,uint256)",
+      "NAND()",
+      "LATCH()",
+      "tapeout(bytes,uint32,uint32)",
+      "eval(uint256,bytes)",
+      "step(uint256,bytes,bytes)",
+      "netlist(uint256)",
+      "circuitInfo(uint256)",
+      "nextId()",
+      "TAPEOUT_FEE()",
+      "TREASURY()",
+      "sweepFees()",
+      "transistors()"
+    ],
+    "unknownSelectors": [
+      "0x01ffc9a7",
+      "0x06fdde03",
+      "0x081812fc",
+      "0x095ea7b3",
+      "0x23b872dd",
+      "0x36e07b61",
+      "0x42842e0e",
+      "0x6352211e",
+      "0x70a08231",
+      "0x8f15b414",
+      "0x95d89b41",
+      "0xa22cb465",
+      "0xb88d4fde",
+      "0xc87b56dd",
+      "0xe985e9c5"
+    ]
+  },
+  "transistors": {
+    "proxy": "0xE3D05dea04d5058eac631bE7DEC59173D583D2b9",
+    "proxyCodeBytes": 295,
+    "beaconSlot": "0x41cb2bfd1ccca8f505eedad0181eef44f1b9ce65",
+    "implSlot": "0x0000000000000000000000000000000000000000",
+    "embedded": [
+      "0xd5ff35b3d5ffdfea2646970667358221220c2e82"
+    ],
+    "beacon": "0x41cb2bfd1ccca8f505eedad0181eef44f1b9ce65",
+    "beaconOwner": "0x0000000000000000000000000000000000000000",
+    "impl": "0x44Ebf3345bcf9aB329e7a28E53fd8EcfAd1a5EFE",
+    "implCodeBytes": 9487,
+    "has": [
+      "mint(uint256,uint256)",
+      "mintPrice()",
+      "protocolFee()",
+      "supplyCap()",
+      "minted()",
+      "withdraw()",
+      "owed(address)",
+      "creator()",
+      "circuits()",
+      "burnFrom(address,uint256,uint256)",
+      "NAND()",
+      "LATCH()",
+      "cpuName()",
+      "cpuSymbol()",
+      "story()",
+      "protocolWallet()"
+    ],
+    "unknownSelectors": [
+      "0x01ffc9a7",
+      "0x0e89341c",
+      "0x2eb2c2d6",
+      "0x4e1273f4",
+      "0x65bcc02b",
+      "0x66209277",
+      "0xa22cb465",
+      "0xe985e9c5",
+      "0xf242432a"
+    ]
+  },
+  "transactions": [
+    {
+      "block": 76040253,
+      "to": "0x1f09daefa827f02cbb40967cc91b259763760761",
+      "call": "0x47f9b5fd",
+      "valueOKB": "0",
+      "gasUsed": 776541,
+      "bem": "0.1 BEM -> 0x571d447f…",
+      "status": "success"
+    },
+    {
+      "block": 76040402,
+      "to": "0x0f096f9669b082df098db16157aeb848bd59d504",
+      "call": "tapeout(280 bytes, 16, 1)",
+      "valueOKB": "0.0013",
+      "gasUsed": 354069,
+      "bem": "-",
+      "status": "success"
+    },
+    {
+      "block": 76040404,
+      "to": "0x0f096f9669b082df098db16157aeb848bd59d504",
+      "call": "tapeout(637 bytes, 48, 1)",
+      "valueOKB": "0.0013",
+      "gasUsed": 464189,
+      "bem": "-",
+      "status": "success"
+    },
+    {
+      "block": 76040407,
+      "to": "0x0f096f9669b082df098db16157aeb848bd59d504",
+      "call": "tapeout(224 bytes, 16, 1)",
+      "valueOKB": "0.0013",
+      "gasUsed": 297214,
+      "bem": "-",
+      "status": "success"
+    },
+    {
+      "block": 76040400,
+      "to": "0xe3d05dea04d5058eac631be7dec59173d583d2b9",
+      "call": "mint(0, 815)",
+      "valueOKB": "0",
+      "gasUsed": 171411,
+      "bem": "0.01 BEM -> 0xe3d05dea…",
+      "status": "success"
+    }
+  ]
+}

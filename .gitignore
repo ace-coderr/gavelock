@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+artifacts/
+cache/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# spike build output
+spike/out/browser/

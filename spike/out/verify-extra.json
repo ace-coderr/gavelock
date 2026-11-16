@@ -1,0 +1,282 @@
+[
+  [
+    "circuitBeacon.codeSize",
+    619
+  ],
+  [
+    "circuitBeacon.owner()",
+    "0x0000000000000000000000000000000000000000"
+  ],
+  [
+    "circuitBeacon has upgradeTo(address)",
+    true
+  ],
+  [
+    "circuitBeacon has owner()",
+    true
+  ],
+  [
+    "circuitBeacon has transferOwnership(address)",
+    true
+  ],
+  [
+    "circuitBeacon has renounceOwnership()",
+    true
+  ],
+  [
+    "circuitBeacon has implementation()",
+    true
+  ],
+  [
+    "circuitBeacon has factory()",
+    false
+  ],
+  [
+    "circuitBeacon has setImplementation(address)",
+    false
+  ],
+  [
+    "circuitBeacon.slot0",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  [
+    "circuitBeacon.slot1",
+    "0x000000000000000000000000977f217887e085d298cb3819cdad5a0ee35f29b2"
+  ],
+  [
+    "circuitBeacon.slot2",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  [
+    "transistorBeacon.codeSize",
+    619
+  ],
+  [
+    "transistorBeacon.owner()",
+    "0x0000000000000000000000000000000000000000"
+  ],
+  [
+    "transistorBeacon has upgradeTo(address)",
+    true
+  ],
+  [
+    "transistorBeacon has owner()",
+    true
+  ],
+  [
+    "transistorBeacon has transferOwnership(address)",
+    true
+  ],
+  [
+    "transistorBeacon has renounceOwnership()",
+    true
+  ],
+  [
+    "transistorBeacon has implementation()",
+    true
+  ],
+  [
+    "transistorBeacon has factory()",
+    false
+  ],
+  [
+    "transistorBeacon has setImplementation(address)",
+    false
+  ],
+  [
+    "transistorBeacon.slot0",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  [
+    "transistorBeacon.slot1",
+    "0x000000000000000000000000265bf10fab9ddec0ee0a649c6b9db845f1b9a06b"
+  ],
+  [
+    "transistorBeacon.slot2",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  [
+    "cpuCount",
+    "424"
+  ],
+  [
+    "factory.deployFee(wei)",
+    "10000000"
+  ],
+  [
+    "factory.protocolFee(wei)",
+    "1000000"
+  ],
+  [
+    "cpu #423",
+    {
+      "circuits": "0x0f096F9669b082Df098Db16157Aeb848BD59d504",
+      "name": "Forkcast",
+      "tapeoutFee": "0.0013",
+      "mintProtocolFee": "0.000000000001",
+      "mintPrice": "0",
+      "supplyCap": "1000000",
+      "minted": "815",
+      "circuitsTaped": "3"
+    }
+  ],
+  [
+    "cpu #422",
+    {
+      "circuits": "0x550992f2dC407BfFDd82c516C0984dc5e00B37d3",
+      "name": "Chipet Heart",
+      "tapeoutFee": "0.0013",
+      "mintProtocolFee": "0.000000000001",
+      "mintPrice": "0",
+      "supplyCap": "100000000",
+      "minted": "0",
+      "circuitsTaped": "0"
+    }
+  ],
+  [
+    "cpu #404",
+    {
+      "circuits": "0x2C078e46aa9fF9dc01aa2B8D0a53f06206654608",
+      "name": "MY 1234",
+      "tapeoutFee": "0.0013",
+      "mintProtocolFee": "0.00066",
+      "mintPrice": "0",
+      "supplyCap": "10000000000000",
+      "minted": "2000000000000",
+      "circuitsTaped": "1"
+    }
+  ],
+  [
+    "cpu #364",
+    {
+      "circuits": "0xDfc1abF794eF40B9EEEBA1d875E7ab2b21a0a146",
+      "name": "TapeWeave",
+      "tapeoutFee": "0.0013",
+      "mintProtocolFee": "0.00066",
+      "mintPrice": "0",
+      "supplyCap": "10000",
+      "minted": "10000",
+      "circuitsTaped": "6"
+    }
+  ],
+  [
+    "cpu #304",
+    {
+      "circuits": "0xeD3D6856B9187C25d5f51e2f85291D4362BcC61D",
+      "name": "Arcade Chips",
+      "tapeoutFee": "0.0013",
+      "mintProtocolFee": "0.00066",
+      "mintPrice": "0.00000001",
+      "supplyCap": "100000000",
+      "minted": "2000000",
+      "circuitsTaped": "1"
+    }
+  ],
+  [
+    "cpu #0",
+    {
+      "circuits": "0x839bdD6fa7A66416A609A735e11DE5411B98574e",
+      "name": "OnlyTestXLayer",
+      "tapeoutFee": "0.0013",
+      "mintProtocolFee": "0.00066",
+      "mintPrice": "0",
+      "supplyCap": "100000",
+      "minted": "100000",
+      "circuitsTaped": "104"
+    }
+  ],
+  [
+    "latest CPUCreated",
+    {
+      "block": 76040253,
+      "tx": "0x7a89ee5bff4e313e6c8f23eb1e0252bb07198a30cb676d42efee55bb8af1637a",
+      "name": "Forkcast",
+      "supply": "1000000",
+      "mintPrice": "0"
+    }
+  ],
+  [
+    "that createCPU tx value (OKB)",
+    "0"
+  ],
+  [
+    "that createCPU gasUsed",
+    "776541"
+  ],
+  [
+    "that createCPU effectiveGasPrice(wei)",
+    "20000001"
+  ],
+  [
+    "getLogs single old block (72,516,039)",
+    "4 logs"
+  ],
+  [
+    "getLogs 100-block window, old",
+    "0 logs"
+  ],
+  [
+    "getLogs 101-block window",
+    "0 logs"
+  ],
+  [
+    "https://xlayer.drpc.org chainId",
+    196
+  ],
+  [
+    "https://xlayer.drpc.org eth_simulateV1",
+    "0x1"
+  ],
+  [
+    "https://xlayer.drpc.org getLogs 1000 blocks",
+    "error: RPC Request failed."
+  ],
+  [
+    "https://xlayerrpc.okx.com chainId",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://xlayerrpc.okx.com eth_simulateV1",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://xlayerrpc.okx.com getLogs 1000 blocks",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://rpc.ankr.com/xlayer chainId",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://rpc.ankr.com/xlayer eth_simulateV1",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://rpc.ankr.com/xlayer getLogs 1000 blocks",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://xlayer-rpc.publicnode.com chainId",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://xlayer-rpc.publicnode.com eth_simulateV1",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://xlayer-rpc.publicnode.com getLogs 1000 blocks",
+    "error: HTTP request failed."
+  ],
+  [
+    "https://rpc.xlayer.tech CORS",
+    "status 200, allow-origin *"
+  ],
+  [
+    "https://xlayer.drpc.org CORS",
+    "status 200, allow-origin *"
+  ],
+  [
+    "https://xlayerrpc.okx.com CORS",
+    "error: fetch failed"
+  ]
+]

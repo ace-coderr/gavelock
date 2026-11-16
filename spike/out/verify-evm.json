@@ -1,0 +1,110 @@
+[
+  [
+    "PUSH0 (Shanghai)",
+    "0x0000000000000000000000000000000000000000000000000000000000000001"
+  ],
+  [
+    "MCOPY (Cancun)",
+    "0x0000000000000000000000000000000000000000000000000000000000000001"
+  ],
+  [
+    "TSTORE/TLOAD (Cancun)",
+    "0x0000000000000000000000000000000000000000000000000000000000000001"
+  ],
+  [
+    "BLOBBASEFEE (Cancun)",
+    "0x0000000000000000000000000000000000000000000000000000000000000001"
+  ],
+  [
+    "BASEFEE",
+    "0x0000000000000000000000000000000000000000000000000000000000000000"
+  ],
+  [
+    "PREVRANDAO",
+    "0x2dd3dda9ece69f80b39d7714aab48cf9d6c7774677c339bdfc542faa272cbaf7"
+  ],
+  [
+    "SHA-256 precompile (0x02) on \"abc\"",
+    "0xba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+  ],
+  [
+    "BLS12-381 G1ADD precompile (0x0b) present",
+    258
+  ],
+  [
+    "intrinsic gas with 0 non-zero calldata bytes",
+    "21000 (- gas/byte)"
+  ],
+  [
+    "intrinsic gas with 1000 non-zero calldata bytes",
+    "61825 (40.83 gas/byte)"
+  ],
+  [
+    "intrinsic gas with 24000 non-zero calldata bytes",
+    "989953 (40.37 gas/byte)"
+  ],
+  [
+    "intrinsic gas with 100000 non-zero calldata bytes",
+    "4054080 (40.33 gas/byte)"
+  ],
+  [
+    "estimateGas with 120000 calldata bytes",
+    "4860429"
+  ],
+  [
+    "estimateGas with 131072 calldata bytes",
+    "5306824"
+  ],
+  [
+    "estimateGas with 200000 calldata bytes",
+    "8085826"
+  ],
+  [
+    "estimateGas with 500000 calldata bytes",
+    "20181064"
+  ],
+  [
+    "gas available to eth_call (no limit given)",
+    "49978998"
+  ],
+  [
+    "gas available to eth_call (gas: 200M)",
+    "49978998"
+  ],
+  [
+    "gas available to eth_call (gas: 1000M)",
+    "49978998"
+  ],
+  [
+    "CREATE runtime of 24576 bytes",
+    "ok"
+  ],
+  [
+    "CREATE runtime of 24577 bytes",
+    "rejected (0x0000000000000000000000000000000000000000000000000000000000000000)"
+  ],
+  [
+    "CREATE runtime of 49152 bytes",
+    "rejected (0x0000000000000000000000000000000000000000000000000000000000000000)"
+  ],
+  [
+    "block",
+    76048164
+  ],
+  [
+    "block gas limit",
+    "210000000"
+  ],
+  [
+    "blobGasUsed field present",
+    true
+  ],
+  [
+    "client version",
+    "reth/v2.3.0-f60420a/x86_64-unknown-linux-gnu/xlayer/v0.0.7"
+  ],
+  [
+    "avg block time over 1000 blocks (s)",
+    "1.000"
+  ]
+]

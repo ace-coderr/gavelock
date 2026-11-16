@@ -1,0 +1,365 @@
+{
+  "forkBlock": 76049935,
+  "chainId": 196,
+  "mainnetGasPriceWei": "20000001",
+  "bem": {
+    "token": "0x60e62Efa9405d6873C5deaBD4E6CC91c25363952",
+    "decimals": 8,
+    "deployFeeUnits": "10000000"
+  },
+  "createWithoutAllowance": "The contract function \"createCPU\" reverted with the following signature:",
+  "createWithOkbValue": "The contract function \"createCPU\" reverted with the following reason:",
+  "bemLeftAfterCreate": "20000000",
+  "processor": {
+    "circuits": "0xb57b56034e2dc25161e2512CfC40b24EA3bee1Fb",
+    "transistors": "0xfCe5366485140045e95EBDba88AD775Fc4aad79F",
+    "number": 424,
+    "isCPU": true
+  },
+  "fees": {
+    "deployFee": "10000000",
+    "mintProtocolFee": "1000000",
+    "tapeoutFee": "1300000000000000",
+    "openFee": "80000000000000000"
+  },
+  "mintWithOkbValue": "The contract function \"mint\" reverted with the following reason:",
+  "mintWithoutAllowance": "The contract function \"mint\" reverted with the following signature:",
+  "bemLeftAfterMints": "18000000",
+  "tapeoutWrongFee": "The contract function \"tapeout\" reverted with the following reason:",
+  "tapeoutNoTransistors": "The contract function \"tapeout\" reverted with the following signature:",
+  "rules": [
+    {
+      "key": "lowestPrice",
+      "name": "Lowest compliant price",
+      "id": 1,
+      "gates": 15,
+      "circuitInfo": [
+        11,
+        5,
+        0,
+        15
+      ],
+      "netlistRoundTrip": true,
+      "tapeoutGas": "283424",
+      "evalGasTxMax": "86457",
+      "checkedInputs": 2048,
+      "mismatches": 0,
+      "outputBytes": 1
+    },
+    {
+      "key": "price60quality40",
+      "name": "Price 60 / Quality 40",
+      "id": 2,
+      "gates": 141,
+      "circuitInfo": [
+        11,
+        5,
+        0,
+        141
+      ],
+      "netlistRoundTrip": true,
+      "tapeoutGas": "605751",
+      "evalGasTxMax": "375099",
+      "checkedInputs": 2048,
+      "mismatches": 0,
+      "outputBytes": 1
+    },
+    {
+      "key": "quality70price30",
+      "name": "Quality 70 / Price 30",
+      "id": 3,
+      "gates": 129,
+      "circuitInfo": [
+        11,
+        5,
+        0,
+        129
+      ],
+      "netlistRoundTrip": true,
+      "tapeoutGas": "571957",
+      "evalGasTxMax": "347957",
+      "checkedInputs": 2048,
+      "mismatches": 0,
+      "outputBytes": 1
+    },
+    {
+      "key": "fastestDelivery",
+      "name": "Fastest compliant delivery",
+      "id": 4,
+      "gates": 75,
+      "circuitInfo": [
+        11,
+        5,
+        0,
+        75
+      ],
+      "netlistRoundTrip": true,
+      "tapeoutGas": "419037",
+      "evalGasTxMax": "223615",
+      "checkedInputs": 2048,
+      "mismatches": 0,
+      "outputBytes": 1
+    },
+    {
+      "key": "customAllInputs",
+      "name": "Custom: every input weighted",
+      "id": 5,
+      "gates": 576,
+      "circuitInfo": [
+        11,
+        5,
+        0,
+        576
+      ],
+      "netlistRoundTrip": true,
+      "tapeoutGas": "1842523",
+      "evalGasTxMax": "1370016",
+      "checkedInputs": 2048,
+      "mismatches": 0,
+      "outputBytes": 1
+    },
+    {
+      "key": "random",
+      "name": "Worst case: random table",
+      "id": 6,
+      "gates": 3296,
+      "circuitInfo": [
+        11,
+        5,
+        0,
+        3296
+      ],
+      "netlistRoundTrip": true,
+      "tapeoutGas": "9596677",
+      "evalGasTxMax": "7622200",
+      "checkedInputs": 256,
+      "mismatches": 0,
+      "outputBytes": 1
+    }
+  ],
+  "ref": {
+    "id": 7,
+    "netlistBytes": 64,
+    "nandBurned": "0",
+    "circuitInfo": [
+      11,
+      5,
+      0,
+      141
+    ],
+    "sampledInputsMatching": "56/56",
+    "evalGasTx": "431601"
+  },
+  "refBadPins": "The contract function \"tapeout\" reverted with the following reason:",
+  "contractEval": {
+    "input": 928,
+    "result": [
+      true,
+      12
+    ],
+    "expected": {
+      "eligible": true,
+      "score": 12
+    }
+  },
+  "contractEvalStored": 12,
+  "guardedLowGas": [
+    false,
+    false,
+    0
+  ],
+  "guardedEnoughGas": [
+    true,
+    true,
+    12
+  ],
+  "guardedMissingCircuit": [
+    false,
+    false,
+    0
+  ],
+  "ciphertextRoundTrip": true,
+  "openSimulated": true,
+  "rows": [
+    {
+      "step": "approve 10000000 BEM units for the factory",
+      "gas": "46393",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "927860046393",
+      "okbTotal": "0.000000927860046393",
+      "note": ""
+    },
+    {
+      "step": "createCPU (Gavelock processor), fee 0.1 BEM",
+      "gas": "776757",
+      "valueWei": "0",
+      "bemUnits": "10000000",
+      "gasCostWei": "15535140776757",
+      "okbTotal": "0.000015535140776757",
+      "note": ""
+    },
+    {
+      "step": "approve BEM for the transistors contract",
+      "gas": "46381",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "927620046381",
+      "okbTotal": "0.000000927620046381",
+      "note": ""
+    },
+    {
+      "step": "mint 360 NAND (4 starter rules), fee 0.01 BEM",
+      "gas": "176211",
+      "valueWei": "0",
+      "bemUnits": "1000000",
+      "gasCostWei": "3524220176211",
+      "okbTotal": "0.000003524220176211",
+      "note": ""
+    },
+    {
+      "step": "mint 3872 NAND (sizing extras, not part of the plan)",
+      "gas": "83111",
+      "valueWei": "0",
+      "bemUnits": "1000000",
+      "gasCostWei": "1662220083111",
+      "okbTotal": "0.000001662220083111",
+      "note": "extra"
+    },
+    {
+      "step": "tapeout \"Lowest compliant price\" (15 NAND)",
+      "gas": "283424",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "5668480283424",
+      "okbTotal": "0.001305668480283424",
+      "note": ""
+    },
+    {
+      "step": "tapeout \"Price 60 / Quality 40\" (141 NAND)",
+      "gas": "605751",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "12115020605751",
+      "okbTotal": "0.001312115020605751",
+      "note": ""
+    },
+    {
+      "step": "tapeout \"Quality 70 / Price 30\" (129 NAND)",
+      "gas": "571957",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "11439140571957",
+      "okbTotal": "0.001311439140571957",
+      "note": ""
+    },
+    {
+      "step": "tapeout \"Fastest compliant delivery\" (75 NAND)",
+      "gas": "419037",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "8380740419037",
+      "okbTotal": "0.001308380740419037",
+      "note": ""
+    },
+    {
+      "step": "tapeout \"Custom: every input weighted\" (576 NAND)",
+      "gas": "1842523",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "36850461842523",
+      "okbTotal": "0.001336850461842523",
+      "note": "extra"
+    },
+    {
+      "step": "tapeout \"Worst case: random table\" (3296 NAND)",
+      "gas": "9596677",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "191933549596677",
+      "okbTotal": "0.001491933549596677",
+      "note": "extra"
+    },
+    {
+      "step": "tapeout a circuit that is one REF to rule 2",
+      "gas": "221971",
+      "valueWei": "1300000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "4439420221971",
+      "okbTotal": "0.001304439420221971",
+      "note": "extra"
+    },
+    {
+      "step": "deploy EvalProbe (3787 bytes of runtime code)",
+      "gas": "873472",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "17469440873472",
+      "okbTotal": "0.000017469440873472",
+      "note": "extra"
+    },
+    {
+      "step": "contract scores 3 bids on rule \"Price 60 / Quality 40\" and stores results",
+      "gas": "1173287",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "23465741173287",
+      "okbTotal": "0.000023465741173287",
+      "note": "extra"
+    },
+    {
+      "step": "publish a 2,000-byte document in an event (SHA-256 on chain)",
+      "gas": "118407",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "2368140118407",
+      "okbTotal": "0.000002368140118407",
+      "note": "extra"
+    },
+    {
+      "step": "publish a 24,000-byte document in an event (SHA-256 on chain)",
+      "gas": "982240",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "19644800982240",
+      "okbTotal": "0.00001964480098224",
+      "note": "extra"
+    },
+    {
+      "step": "publish a 100,000-byte document in an event (SHA-256 on chain)",
+      "gas": "4022270",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasCostWei": "80445404022270",
+      "okbTotal": "0.00008044540402227",
+      "note": "extra"
+    },
+    {
+      "step": "seal a bid: commitment + 400-byte ciphertext kept on chain + deposit",
+      "gas": "232713",
+      "valueWei": "1000000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "4654260232713",
+      "okbTotal": "0.001004654260232713",
+      "note": "extra"
+    },
+    {
+      "step": "seal a bid: commitment + 700-byte ciphertext kept on chain + deposit",
+      "gas": "280554",
+      "valueWei": "1000000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "5611080280554",
+      "okbTotal": "0.001005611080280554",
+      "note": "extra"
+    },
+    {
+      "step": "seal a bid: commitment + 1500-byte ciphertext kept on chain + deposit",
+      "gas": "453873",
+      "valueWei": "1000000000000000",
+      "bemUnits": "0",
+      "gasCostWei": "9077460453873",
+      "okbTotal": "0.001009077460453873",
+      "note": "extra"
+    }
+  ]
+}

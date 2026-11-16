@@ -1,0 +1,24 @@
+{
+  "chain": {
+    "hash": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+    "period": 3,
+    "genesis": 1692803367,
+    "scheme": "bls-unchained-g1-rfc9380",
+    "sameAsDefault": true
+  },
+  "plaintextBytes": 448,
+  "commitment": "0xbdccc113c8e9e245bd1561449d1b5a623f0fefdf0d226f07dbdb380e76ddbb1a",
+  "round": 34005040,
+  "roundTime": "2026-11-16T08:41:24.000Z",
+  "encryptMs": 289,
+  "armoredChars": 1161,
+  "binaryBytes": 807,
+  "earlyDecrypt": "refused: It's too early to decrypt the ciphertext - decryptable at round 34005040",
+  "decryptMs": 2145,
+  "roundTrip": true,
+  "commitmentMatches": true,
+  "farRound": {
+    "round": 34869041,
+    "ok": true
+  }
+}

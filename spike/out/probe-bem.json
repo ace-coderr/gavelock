@@ -1,0 +1,146 @@
+{
+  "bem": "0x60e62Efa9405d6873C5deaBD4E6CC91c25363952",
+  "name": "BEM",
+  "symbol": "BEM",
+  "decimals": 8,
+  "totalSupply": "1609710778200",
+  "deployFeeUnits": "10000000",
+  "deployFee": "0.1",
+  "factoryProtocolFeeUnits": "1000000",
+  "lastCreationPaid": {
+    "from": "0x095D0F464a13496A7582FF89756330D8442cfA66",
+    "to": "0x571d447f4f24688eC35Ccf07f1D6993655F6aF15",
+    "units": "10000000"
+  },
+  "history": [
+    {
+      "block": 76048665,
+      "time": "2026-11-16T08:28",
+      "impl": "0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a",
+      "deployFee": "10000000"
+    },
+    {
+      "block": 76038665,
+      "time": "2026-11-16T05:41",
+      "impl": "0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a",
+      "deployFee": "10000000"
+    },
+    {
+      "block": 75948665,
+      "time": "2026-11-15T04:41",
+      "impl": "0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a",
+      "deployFee": "10000000"
+    },
+    {
+      "block": 75748665,
+      "time": "2026-11-12T21:08",
+      "impl": "0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a",
+      "deployFee": "10000000"
+    },
+    {
+      "block": 75448665,
+      "time": "2026-11-09T09:48",
+      "impl": "0x336e9f0f4c3fee7c8c803377e4dea00293f4ae2a",
+      "deployFee": "10000000"
+    },
+    {
+      "block": 75048665,
+      "time": "2026-11-04T18:41",
+      "impl": "0xb41c1e7602eb5734be2430b72178ccb814a5293d",
+      "deployFee": "6600000000000000"
+    },
+    {
+      "block": 74548665,
+      "time": "2026-10-29T23:48",
+      "impl": "0xb41c1e7602eb5734be2430b72178ccb814a5293d",
+      "deployFee": "6600000000000000"
+    },
+    {
+      "block": 74048665,
+      "time": "2026-10-24T04:55",
+      "impl": "0xb41c1e7602eb5734be2430b72178ccb814a5293d",
+      "deployFee": "6600000000000000"
+    },
+    {
+      "block": 73048665,
+      "time": "2026-10-12T15:08",
+      "impl": "0x74956236ab64ed143933040b4137e8a352e4d17b",
+      "deployFee": "6600000000000000"
+    }
+  ],
+  "recentTransfers": 59,
+  "sample": [
+    {
+      "block": 76048571,
+      "from": "0x2CcF8aa17F5DF9Fb5D51C9de12135a913fF29f7A",
+      "to": "0x84Bd6C0431F2DB78615884416c5f9519D852D196",
+      "value": "17.32573371"
+    },
+    {
+      "block": 76048571,
+      "from": "0x84Bd6C0431F2DB78615884416c5f9519D852D196",
+      "to": "0x360E68faCcca8cA495c1B759Fd9EEe466db9FB32",
+      "value": "17.32573371"
+    },
+    {
+      "block": 76048571,
+      "from": "0x58eaD5b41Cfd3627791D439402dd65571c286484",
+      "to": "0xe9D483ae00Cb6c972b38A8bac7f72640959F3b40",
+      "value": "0.79875772"
+    },
+    {
+      "block": 76048482,
+      "from": "0x9070Bbe1C566F5d3743dC40b86CA47D1353f9b3b",
+      "to": "0x26Dc8281B63E13973D65bdb591dF611544106886",
+      "value": "0.09597326"
+    },
+    {
+      "block": 76048487,
+      "from": "0x26Dc8281B63E13973D65bdb591dF611544106886",
+      "to": "0x011fc2C7B80e59e20c6cF1d27a29729D125f5Bf4",
+      "value": "0.09597326"
+    },
+    {
+      "block": 76048404,
+      "from": "0x8C0503460D972CEE16Acd1bF7801B2048AA72A42",
+      "to": "0x9070Bbe1C566F5d3743dC40b86CA47D1353f9b3b",
+      "value": "10.14669609"
+    },
+    {
+      "block": 76048162,
+      "from": "0x2CcF8aa17F5DF9Fb5D51C9de12135a913fF29f7A",
+      "to": "0x58d3eB5FcC0FDB9488DFE2c24EdC27FaefC8f26B",
+      "value": "4"
+    },
+    {
+      "block": 76048064,
+      "from": "0x9070Bbe1C566F5d3743dC40b86CA47D1353f9b3b",
+      "to": "0x26Dc8281B63E13973D65bdb591dF611544106886",
+      "value": "0.08973699"
+    },
+    {
+      "block": 76048069,
+      "from": "0x26Dc8281B63E13973D65bdb591dF611544106886",
+      "to": "0x011fc2C7B80e59e20c6cF1d27a29729D125f5Bf4",
+      "value": "0.08973699"
+    },
+    {
+      "block": 76048024,
+      "from": "0x9070Bbe1C566F5d3743dC40b86CA47D1353f9b3b",
+      "to": "0x7c5bEE2a8091C3ef39072f64F18Fac913060AEaF",
+      "value": "10.46677941"
+    },
+    {
+      "block": 76048024,
+      "from": "0x7c5bEE2a8091C3ef39072f64F18Fac913060AEaF",
+      "to": "0xcc96b656b6dff0B5318d53271b82B7E7183b95D2",
+      "value": "10.46677941"
+    },
+    {
+      "block": 76048024,
+      "from": "0xcc96b656b6dff0B5318d53271b82B7E7183b95D2",
+      "to": "0x2CcF8aa17F5DF9Fb5D51C9de12135a913fF29f7A",
+      "value": "10.46677941"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@gavelock/spike",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Task 0 protocol spike: read-only checks against X Layer mainnet and cost measurement on a local fork.",
+  "scripts": {
+    "verify": "node scripts/verify-chain.mjs",
+    "fork": "hardhat run scripts/fork-costs.ts",
+    "tlock": "node scripts/tlock-check.mjs"
+  },
+  "dependencies": {
+    "tlock-js": "^0.9.0",
+    "viem": "^2.57.20"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "hardhat": "^3.22.0",
+    "@nomicfoundation/hardhat-viem": "^3.1.0",
+    "typescript": "^5.9.0"
+  }
+}
