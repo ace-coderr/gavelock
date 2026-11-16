@@ -14,7 +14,7 @@ Updated 16 November 2026. To resume in a new session: read this file and `docs/P
 | 0 | Protocol spike, cost table | Done. Gate A approved 16 November. |
 | 1 | Monorepo scaffold + GitHub Pages deploy | Done 16 November. |
 | 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | Done 16 November. |
-| 3 | Contracts + tests on an X Layer fork | **Next** |
+| 3 | Contracts + tests on an X Layer fork | **In progress**: rule stock done and proven; tender contract next |
 | 4 | Web app | Not started |
 | 5 | MCP package | Not started |
 | 6 | Audit pass | Not started |
@@ -39,6 +39,22 @@ https://ace-coderr.github.io/gavelock/ is deployed by `.github/workflows/deploy.
 3. **Paged finalize.** Anyone can call any page; the award is identical for every page size and caller; ties resolve the same way; the challenge recompute uses the same paged path. Tests for each.
 
 Approved as written: block numbers on every record, bid ciphertexts as contract code, the 1,500-NAND cap in the rule builder.
+
+## Task 3 progress
+
+**Gate A condition 1 is proven on the fork** (`packages/contracts/test/fork/ruleStock.fork.test.ts`, 15 tests, run with `npm run test:fork`):
+
+- `RuleStock.open()` creates the processor (mint price 0, supply 100,000,000) and mints the entire supply to itself in one transaction: 999,058 gas, 0.1 + 0.01 BEM pulled from the caller by allowance to the stock.
+- After that `minted == supplyCap`, so a stranger with the fee token and an allowance cannot mint NAND or LATCH (`supply cap`). The stock has three state-changing functions (`open`, `tapeOut`, `withdrawFees`) and none moves transistors.
+- A caller with no fee token and no transistors tapes out a rule for exactly `TAPEOUT_FEE + ruleFee` in OKB and owns the circuit. Starter rules cost 352,925 to 744,458 gas each through the stock.
+- The rule fee (0.002 OKB in the tests; fixed at deployment, final value at Gate B) accrues and goes to the fee address when anyone calls `withdrawFees`.
+- Only flat NAND netlists of 11 inputs / 5 outputs and at most 1,500 gates are accepted. A 1,500-gate rule costs 4,906,243 gas to tape out and 3,486,102 gas per `eval`.
+- Draining the stock needs 66,665 maximum-size tape-outs: 86.66 OKB in TapeOut fees plus the rule fees.
+- Each starter rule returns its core-library truth table through on-chain `eval` on all 2,048 inputs.
+
+Deploy order this implies for Gate B: deploy `RuleStock`, approve it for 0.11 BEM, call `open()`, tape out the four starter rules through `tapeOut()`.
+
+Still to build in Task 3: the tender contract (lifecycle, documents and ciphertexts as contract code, panel commit-reveal, paged finalize, challenges, pull refunds), its tests, and the measurements for conditions 2 and 3.
 
 ## Decisions made in Task 2 (the contract must match these exactly)
 
