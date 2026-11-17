@@ -81,7 +81,7 @@ export function Tender() {
         ))}
       </nav>
 
-      {tab === 'Documents' && <Documents tender={t} />}
+      {tab === 'Documents' && <Documents tender={t} onChanged={detail.reload} />}
       {tab === 'Clarifications' && <Clarifications tender={t} onChanged={detail.reload} />}
       {tab === 'Bid Room' && <BidRoom tender={t} onChanged={detail.reload} />}
       {tab === 'Opening' && <Opening tender={t} onChanged={detail.reload} />}

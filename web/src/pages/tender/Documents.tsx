@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DocumentUpload } from '../../components/DocumentUpload.tsx';
 import { fetchDocument, type DocumentRecord, type TenderDetail } from '../../lib/tender.ts';
 
 function DocumentRow({ doc }: { doc: DocumentRecord }) {
@@ -53,15 +54,19 @@ function DocumentRow({ doc }: { doc: DocumentRecord }) {
   );
 }
 
-export function Documents({ tender }: { tender: TenderDetail }) {
-  if (tender.documents.length === 0) {
-    return <p className="empty">The buyer has not posted any document. Once bidding starts, none can be added.</p>;
-  }
+export function Documents({ tender, onChanged }: { tender: TenderDetail; onChanged: () => void }) {
   return (
-    <ul className="stack">
-      {tender.documents.map((doc) => (
-        <DocumentRow key={doc.index} doc={doc} />
-      ))}
-    </ul>
+    <div className="stack">
+      {tender.documents.length === 0 ? (
+        <p className="empty">The buyer has not posted any document. Once bidding starts, none can be added.</p>
+      ) : (
+        <ul className="stack">
+          {tender.documents.map((doc) => (
+            <DocumentRow key={doc.index} doc={doc} />
+          ))}
+        </ul>
+      )}
+      <DocumentUpload tender={tender} onChanged={onChanged} />
+    </div>
   );
 }
