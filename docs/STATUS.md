@@ -85,6 +85,11 @@ The TypeScript in `packages/core` is the specification; contract tests compare t
 - **Starter rules** (form weights, no gates): lowest price = price 100 (15 NAND); price 60 / quality 40 (141 NAND); quality 70 / price 30 (133 NAND); fastest delivery = delivery 100 (12 NAND). Score = round-half-up of 15 * weighted fraction, integer arithmetic.
 - **Sealing:** `@gavelock/core/seal`. Sealing is offline; opening fetches one drand round and verifies its signature. The ciphertext on chain is the binary age payload (583 bytes for a short note, about 810 for a 240-character note).
 
+## Stretch of 17 November: lean profile and UI pass
+
+- **Lean Gate B** (docs/GATE-B-LEAN.md): one rule, 0.001 OKB tender fee, 2 demo bidders, about 0.025 OKB plus 0.12 BEM. Rehearsed on the fork. Other rules later with `scripts/add-rules.ts`. Nothing sent to mainnet; no deploy key.
+- **UI pass**: warm dark theme (tokens in `web/src/styles/tokens.css`), Instrument Serif and Inter (Latin, local), pinned stage wheel, sticky split sections, glass over the bids, receipts, chips and switches, panel seats, drag rows. Audited in docs/AUDIT.md (10 fixes). Site is 970,824 bytes. Open: frame rate and real-touch checks.
+
 ## What exists
 
 - Root npm workspaces: `packages/core` (chain constants, deployment record, drand rounds, rule layout / form / NAND compiler / netlist codec and simulator, bid encoding and commitment, banding, reference award, time-lock sealing; 60 tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.

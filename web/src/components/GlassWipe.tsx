@@ -20,6 +20,13 @@ export function GlassWipe({ word, hint, children }: { word: string; hint: string
   const last = useRef<{ x: number; y: number } | null>(null);
   const timer = useRef(0);
   const [cleared, setCleared] = useState(false);
+  const again = useRef<HTMLButtonElement>(null);
+  const byButton = useRef(false);
+  // A disabled button drops keyboard focus, so when the glass is cleared with the button, focus moves to the one that undoes it.
+  useEffect(() => {
+    if (cleared && byButton.current) again.current?.focus();
+    byButton.current = false;
+  }, [cleared]);
 
   const paint = useCallback(() => {
     timer.current = 0;
@@ -120,11 +127,11 @@ export function GlassWipe({ word, hint, children }: { word: string; hint: string
       />
       <div className="glass__hint">
         <span className="glass__pill" aria-hidden="true">Wipe the glass to look inside</span>
-        <button type="button" className="glass__pill" onClick={() => setCleared(true)} disabled={cleared}>
+        <button type="button" className="glass__pill" onClick={() => { byButton.current = true; setCleared(true); }} disabled={cleared}>
           Clear the glass
         </button>
         {cleared && (
-          <button type="button" className="glass__pill" onClick={frostAgain}>
+          <button ref={again} type="button" className="glass__pill" onClick={frostAgain}>
             Frost it again
           </button>
         )}

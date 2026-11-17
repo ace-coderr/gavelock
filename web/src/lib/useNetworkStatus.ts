@@ -56,7 +56,8 @@ async function fetchSnapshot(): Promise<NetworkSnapshot> {
 
 function describe(error: unknown): string {
   const e = error as { shortMessage?: string; message?: string };
-  return (e.shortMessage ?? e.message ?? 'Unknown error').split('\n')[0] ?? 'Unknown error';
+  const first = (e.shortMessage ?? e.message ?? 'Unknown error').split('\n')[0] ?? 'Unknown error';
+  return first.endsWith('.') ? first.slice(0, -1) : first;
 }
 
 /**

@@ -109,3 +109,55 @@ These belong in the README.
 - **Secrets.** A bid's salt and a panel member's scores are kept only in that browser's local storage,
   and the page tells the user so and offers a download. Losing them means the bid cannot be opened by its
   owner, but anyone else can still open a correctly sealed bid.
+
+# Audit of the UI pass (17 November 2026)
+
+The Palazzo-style redesign: warm dark theme, display serif, the pinned stage wheel, the sticky split
+sections, the frosted glass over the bids, tilted cards, chips and switches, panel seats and drag rows. Every
+check below was run in a real browser (the built site served from localhost) unless it says otherwise.
+
+## Found and fixed
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | The built site was 1,005,954 bytes, over the 1 MB budget. | The generated ABIs drop `internalType` and events the app never reads (65 KB to 26 KB); react-router, a large library for what is a tiny hash router, was replaced by a 130-line router with its own tests. The site is now **970,824 bytes in 9 files**. |
+| 2 | The footer wheel's disc escaped its container and made the page wider than the screen (a horizontal scrollbar). | The container is now positioned, so the disc is clipped. |
+| 3 | While scrolling quickly, the stage title and text did not change until scrolling paused, because every stage change restarted the swap timer. | One blur-out, then show whichever stage is current: a fast scroll can no longer starve the text. |
+| 4 | Keyboard and button steps on the wheel computed their target from the displayed stage, which had not moved yet, and smooth page-scrolling was restarted by the next key. Three presses did not move three stages. | Steps continue from the last requested stage; the page jumps and the wheel eases by itself. Verified with real key presses: three Right arrows went from stage 1 to 4, two Left arrows back to 2. |
+| 5 | The hero wheel and the footer wheel had the same accessible name ("Tender stage"). | "Tender stage, hero wheel" and "Tender stage, explainer wheel". |
+| 6 | One colour pair failed WCAG 4.5:1: the faint label colour on a raised receipt card (4.47:1). | The token was lightened (5.10:1). `web/scripts/contrast.mjs` computes every pair from `tokens.css` and fails if one drops below its minimum; all 17 pairs pass (the lowest text pair is 5.10:1, body text is 15.7:1). |
+| 7 | Activating "Clear the glass" with the keyboard disabled the button it was on, so keyboard focus was dropped. | Focus moves to "Frost it again". Verified: Tab reaches the button, Enter clears the glass, and the frosted copy contributes no focusable controls (it is inert and hidden from assistive technology). |
+| 8 | The scroll position was published as a CSS variable on the root element, which invalidates the style of every element on the page on every frame. | It is set only on the floating cards. |
+| 9 | The tender cards on the Board did not link to their tender page. | The title now links to `/t/<id>`. |
+| 10 | A failed node request read "HTTP request failed.." with two full stops. | Trailing full stop removed. |
+
+## Checked and found sound
+
+- **Layout.** No horizontal page scroll at 375 px (phone), 768 px (tablet) or 1280 px (desktop) on the Board,
+  New tender, Rules, Rule Prover, Verify, How it works, tender, Supplier, Buyer and not-found pages.
+- **Reduced motion.** With `prefers-reduced-motion: reduce` the hero is not pinned (both wheels run in their
+  button-driven mode), everything that blurs in is visible at once, and the glass is not drawn: content is simply
+  shown. The motion tokens are zero as well, so no transition runs.
+- **Empty states.** With no tender on chain the Board says so, labels the wheel as an explainer, and shows no
+  tender cards. The Studio shows every rule struck through with the reason ("The processor is not deployed yet").
+- **RPC failure.** With every node request failing, the network panel says "Node unreachable", that no figures
+  have loaded, offers a retry, and the rest of the page keeps working.
+- **No other origin.** The build contains no external script, stylesheet, font or image reference (checked by a
+  scan of the output and, in CI, by the deploy workflow). At run time the page talks only to X Layer nodes, and to
+  drand when a bid is sealed or opened.
+- **Content is real.** The wheel marks a real tender's stage when one exists and otherwise says it is an
+  explainer. The seal and the rule grid are drawn from the current drand round and from every outcome of a rule
+  computed in the browser; the floating cards, receipts and the bids list appear only with data read from the chain.
+
+## Not verified
+
+- **Frame rate.** The goal is 60 fps on a mid-range phone. It could not be measured: the browser pane used for
+  testing was hidden, and a hidden pane pauses `requestAnimationFrame`. By design the per-frame work is small
+  (one scroll read, one attribute write on the wheel, one variable write per floating card), and no animation
+  library is used, but this is reasoning, not a measurement.
+- **Real touch.** The glass wipe and the wheel drag use pointer events with `touch-action` set, which is the
+  standard route for touch, but they were exercised here with mouse events only. A phone test is still owed.
+- **Live data on the tender page.** Its bids split, rule-grid marker, receipts, glass over real bids and panel seats were
+  exercised with sample content in a throw-away page that was not committed; with real data they are first seen
+  after the contracts are deployed.
+- **Frame-level contrast of the glass** and decorative hairlines were not measured; text on them is above 15:1.

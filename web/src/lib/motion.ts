@@ -45,29 +45,30 @@ export function useReveal<T extends HTMLElement>(): React.RefObject<T | null> {
 }
 
 /**
- * Publishes the scroll position as the CSS variable `--sy` (pixels) on the root, at most once per frame,
- * for elements that drift as the page moves. One passive listener for the whole app.
+ * Publishes the scroll position as the CSS variable `--sy` (pixels) on each `.float` card, at most once per frame,
+ * so the cards drift as the page moves. The variable is set on the cards themselves, never on the root: a custom
+ * property set on the root would invalidate the style of every element in the page on every frame.
  */
 export function useScrollVariable(): void {
   const reduced = useReducedMotion();
   useEffect(() => {
-    const root = document.documentElement;
-    if (reduced) {
-      root.style.setProperty('--sy', '0');
-      return;
-    }
+    if (reduced) return;
     let frame = 0;
     const write = () => {
       frame = 0;
-      root.style.setProperty('--sy', String(Math.round(window.scrollY)));
+      const y = String(Math.round(window.scrollY));
+      document.querySelectorAll<HTMLElement>('.float').forEach((el) => el.style.setProperty('--sy', y));
     };
     const on = () => {
       if (!frame) frame = requestAnimationFrame(write);
     };
     write();
     window.addEventListener('scroll', on, { passive: true });
+    // Cards appear after data loads, so pick them up shortly after navigation too.
+    const late = window.setTimeout(write, 600);
     return () => {
       window.removeEventListener('scroll', on);
+      window.clearTimeout(late);
       if (frame) cancelAnimationFrame(frame);
     };
   }, [reduced]);

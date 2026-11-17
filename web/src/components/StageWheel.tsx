@@ -105,20 +105,27 @@ export function StageWheel({ live, mode = 'pinned' }: { live?: LiveStage | null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pinned]);
 
-  /** Go to a stage: scroll to it when pinned, otherwise turn directly. */
+  /**
+   * Go to a stage: set the scroll position when pinned, otherwise turn directly. The page jumps and the wheel
+   * eases to the new angle by itself, so a key held down or pressed quickly keeps up.
+   */
+  const goal = useRef<{ n: number; at: number } | null>(null);
   const go = useCallback(
     (i: number) => {
       const n = clamp(i, 0, N - 1);
+      goal.current = { n, at: performance.now() };
       const el = section.current;
       if (pinned && el) {
         const range = el.offsetHeight - window.innerHeight;
-        window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + (n / (N - 1)) * range, behavior: reduced ? 'auto' : 'smooth' });
+        window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + (n / (N - 1)) * range, behavior: 'auto' });
       } else {
         aim(n);
       }
     },
-    [pinned, aim, reduced],
+    [pinned, aim],
   );
+  /** One step from where the last request was heading, if that was just now; otherwise from the shown stage. */
+  const step = (delta: number) => go((goal.current && performance.now() - goal.current.at < 1000 ? goal.current.n : stage) + delta);
 
   // Dragging the wheel: the angle the pointer sweeps becomes the number of stages turned.
   const drag = useRef<{ angle: number; start: number } | null>(null);
@@ -149,10 +156,15 @@ export function StageWheel({ live, mode = 'pinned' }: { live?: LiveStage | null;
     if (!pinned) aim(Math.round(target.current));
   };
   const onKey = (e: React.KeyboardEvent) => {
-    const keys: Record<string, number> = { ArrowRight: stage + 1, ArrowDown: stage + 1, ArrowLeft: stage - 1, ArrowUp: stage - 1, Home: 0, End: N - 1 };
-    if (e.key in keys) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
-      go(keys[e.key]!);
+      step(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      step(-1);
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      go(e.key === 'Home' ? 0 : N - 1);
     }
   };
 
@@ -193,10 +205,10 @@ export function StageWheel({ live, mode = 'pinned' }: { live?: LiveStage | null;
           </div>
           <StageText stage={stage} />
           <div className="wheel__controls">
-            <button type="button" className="button" onClick={() => go(stage - 1)} disabled={stage === 0} aria-label="Previous stage">
+            <button type="button" className="button" onClick={() => step(-1)} disabled={stage === 0} aria-label="Previous stage">
               Back
             </button>
-            <button type="button" className="button button--solid" onClick={() => go(stage + 1)} disabled={stage === N - 1} aria-label="Next stage">
+            <button type="button" className="button button--solid" onClick={() => step(1)} disabled={stage === N - 1} aria-label="Next stage">
               Next stage
             </button>
           </div>
@@ -208,7 +220,7 @@ export function StageWheel({ live, mode = 'pinned' }: { live?: LiveStage | null;
           viewBox="-210 -210 420 420"
           role="slider"
           tabIndex={0}
-          aria-label="Tender stage"
+          aria-label={mode === 'pinned' ? 'Tender stage, hero wheel' : 'Tender stage, explainer wheel'}
           aria-orientation="horizontal"
           aria-valuemin={1}
           aria-valuemax={N}
