@@ -106,9 +106,22 @@ a {
   align-items: center;
   gap: var(--space-1);
   margin-left: auto;
+  /* Many links never widen the page: they scroll inside the bar. */
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav__links::-webkit-scrollbar {
+  display: none;
+}
+
+.nav__brand {
+  flex: none;
 }
 
 .nav__link {
+  flex: none;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
