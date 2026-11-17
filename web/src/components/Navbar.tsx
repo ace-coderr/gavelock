@@ -2,6 +2,7 @@ import { Link, NavLink } from 'react-router';
 
 const links = [
   { to: '/', label: 'Tender Board', end: true },
+  { to: '/rules', label: 'Rules', end: false },
   { to: '/docs', label: 'How it works', end: false },
 ];
 
