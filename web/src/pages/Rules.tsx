@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { DEPLOYMENT, STARTER_RULES, compileRule, isDeployed, truthTable } from '@gavelock/core';
+import { RuleBuilder } from '../components/RuleBuilder.tsx';
 import { shortAddress } from '../lib/format.ts';
 import { listOnChainRules } from '../lib/rules.ts';
 import { useAsync } from '../lib/useAsync.ts';
@@ -51,6 +52,8 @@ export function Rules() {
           ))}
         </ul>
       </section>
+
+      <RuleBuilder />
 
       <section className="stack" aria-label="Rules on chain">
         <h2 className="card__title">On X Layer</h2>
