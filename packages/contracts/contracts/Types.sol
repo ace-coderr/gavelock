@@ -65,6 +65,8 @@ struct Tender {
     /// Zero when the contract itself cancelled the tender (no bids, no quorum, ...).
     address cancelledBy;
     address cancelReason;
+    /// The tender ended because the buyer left a challenge unruled for a whole standstill.
+    bool stalled;
 }
 
 struct Bid {

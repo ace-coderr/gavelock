@@ -76,6 +76,7 @@ export function Award({ tender, onChanged }: { tender: TenderDetail; onChanged: 
               <li key={c.index} className="card stack">
                 <p><strong>{KINDS[c.kind]}</strong> against bid {c.bidIndex + 1} · <span className="status status--pending">{RULINGS[c.ruling]}</span></p>
                 <p>{c.reason}</p>
+                {!c.bondPaid && (c.ruling !== 0 || done) && <TxButton label="Pay out this challenge bond" request={{ to, data: encodeFunctionData({ abi: gavelockAbi, functionName: 'claimBond', args: [tender.id, BigInt(c.index)] }) }} onConfirmed={onChanged} />}
                 {c.ruling !== 0 && <p style={{ color: 'var(--color-text-muted)' }}><strong>Buyer’s ruling:</strong> {c.rulingReason}</p>}
                 {c.ruling === 0 && isBuyer && !done && (
                   <>
@@ -93,10 +94,11 @@ export function Award({ tender, onChanged }: { tender: TenderDetail; onChanged: 
         {standstill && (
           <div className="card stack">
             <h4 className="card__title">File a challenge</h4>
+            <p style={{ color: 'var(--color-text-muted)' }}>A challenge needs a bond of {r.bidDeposit.toString()} wei, the same as the bid deposit. It comes back to you if the challenge is upheld or if the tender ends before the buyer rules. If the buyer rejects it, the bond goes to the Gavelock fee address, never to the buyer.</p>
             <label className="fact"><span className="fact__label">Bid number</span><input className="button" inputMode="numeric" value={bidIndex} onChange={(e) => setBidIndex(e.target.value)} /></label>
             <label className="fact"><span className="fact__label">Kind</span><select className="button" value={kind} onChange={(e) => setKind(Number(e.target.value))}>{KINDS.map((k, i) => <option key={k} value={i}>{k}</option>)}</select></label>
             <textarea className="button" rows={3} maxLength={2048} placeholder="What is wrong, and how can it be checked?" value={reason} onChange={(e) => setReason(e.target.value)} />
-            <TxButton label="File the challenge" request={reason.trim() && /^\d+$/.test(bidIndex) && Number(bidIndex) >= 1 ? { to, data: encodeFunctionData({ abi: gavelockAbi, functionName: 'challenge', args: [tender.id, BigInt(Number(bidIndex) - 1), kind, reason.trim()] }) } : null} onConfirmed={() => { setReason(''); onChanged(); }} />
+            <TxButton label="File the challenge" request={reason.trim() && /^\d+$/.test(bidIndex) && Number(bidIndex) >= 1 ? { to, value: r.bidDeposit, data: encodeFunctionData({ abi: gavelockAbi, functionName: 'challenge', args: [tender.id, BigInt(Number(bidIndex) - 1), kind, reason.trim()] }) } : null} onConfirmed={() => { setReason(''); onChanged(); }} />
           </div>
         )}
       </section>

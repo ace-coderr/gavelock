@@ -55,6 +55,10 @@ contract Gavelock {
     uint256 public constant DELIVERY_STEP_MAX = 3650;
     /// Largest abnormally-low floor: 100% of the median compliant price. 0 switches the rule off.
     uint256 public constant ABNORMAL_FLOOR_MAX = 10_000;
+    /// Most sealed bids one tender accepts. Bounds the work of the panel and of every walk over the bids.
+    uint256 public constant MAX_BIDS = 200;
+    /// Smallest bid deposit (and so smallest challenge bond). Free slots would let anyone fill a tender with junk.
+    uint256 public constant MIN_DEPOSIT = 0.001 ether;
     uint256 private constant DRAND_GENESIS = 1692803367;
     uint256 private constant DRAND_PERIOD = 3;
 
@@ -105,6 +109,10 @@ contract Gavelock {
         uint64 ruledBlock;
         address reason;
         address rulingReason;
+        /// Paid with the challenge, equal to the tender's bid deposit. Returned if upheld (or if the
+        /// tender ends first); a rejected challenge's bond goes to the fee address, never to the buyer.
+        uint96 bond;
+        bool bondPaid;
     }
 
     Tender[] private _tenders;
@@ -127,6 +135,7 @@ contract Gavelock {
     event Finalized(uint256 indexed tenderId, uint256 indexed winner);
     event Cancelled(uint256 indexed tenderId, address indexed by);
     event DepositClaimed(uint256 indexed tenderId, uint256 indexed index, address indexed to, uint256 amount);
+    event BondPaid(uint256 indexed tenderId, uint256 indexed index, address indexed to, uint256 amount);
     event FeesWithdrawn(address indexed recipient, uint256 amount);
 
     error NoSuchTender();
@@ -146,6 +155,8 @@ contract Gavelock {
     error CommitmentMismatch();
     error BadBid();
     error BadHint();
+    error BadDeposit();
+    error TenderFull();
     error NotEnoughGas();
     error ChallengesOpen();
     error NothingToDo();
@@ -199,6 +210,7 @@ contract Gavelock {
         _checkChecklist(p.checklistItems, p.mandatoryMask, p.preferredAMask, p.preferredBMask);
         _checkLadders(p.priceLadderBps, p.deliveryLadderDays);
         if (p.abnormalFloorBps > ABNORMAL_FLOOR_MAX) revert BadLadder();
+        if (p.bidDeposit < MIN_DEPOSIT) revert BadDeposit();
         if (p.terms.length == 0 || p.terms.length > TERMS_MAX) revert BadLength();
 
         id = _tenders.length;
@@ -277,6 +289,7 @@ contract Gavelock {
 
         Bid[] storage bids = _bids[id];
         index = bids.length;
+        if (index >= MAX_BIDS) revert TenderFull();
         Bid storage b = bids.push();
         b.bidder = msg.sender;
         b.sealedBlock = uint64(block.number);
@@ -328,14 +341,16 @@ contract Gavelock {
 
     // ================================================================== standstill
 
-    function challenge(uint256 id, uint256 bidIndex, uint8 kind, string calldata reason) external returns (uint256 index) {
+    /// @notice Challenge an opened bid during the standstill. Send exactly the tender's bid deposit as a bond.
+    function challenge(uint256 id, uint256 bidIndex, uint8 kind, string calldata reason) external payable returns (uint256 index) {
         Tender storage t = _tender(id);
         if (t.cancelled || t.closed || t.awardedAt == 0 || block.timestamp >= t.standstillEnd) revert WrongPhase();
         if (bidIndex >= _bids[id].length || kind > KIND_SEAL_MISMATCH) revert NoSuchRecord();
         Bid storage b = _bids[id][bidIndex];
         if (!b.opened || b.disqualified) revert BadBid();
+        if (msg.value != t.bidDeposit) revert WrongValue(t.bidDeposit);
         index = _challenges[id].length;
-        _challenges[id].push(Challenge(msg.sender, uint32(bidIndex), kind, RULING_PENDING, uint64(block.number), 0, _text(reason), address(0)));
+        _challenges[id].push(Challenge(msg.sender, uint32(bidIndex), kind, RULING_PENDING, uint64(block.number), 0, _text(reason), address(0), uint96(msg.value), false));
         t.openChallenges++;
         emit Challenged(id, index, bidIndex, kind, msg.sender);
     }
@@ -384,6 +399,7 @@ contract Gavelock {
         Tender storage t = _tender(id);
         if (t.cancelled || t.closed || t.standstillEnd == 0) revert WrongPhase();
         if (t.openChallenges == 0 || block.timestamp < uint256(t.standstillEnd) + t.standstill) revert NothingToDo();
+        t.stalled = true;
         _end(id, t, "The buyer did not rule on a challenge in time.");
     }
 
@@ -424,8 +440,29 @@ contract Gavelock {
     function depositRecipient(uint256 id, uint256 index) public view returns (address) {
         Tender storage t = _tender(id);
         Bid storage b = _bids[id][index];
-        bool windowCompleted = !t.cancelled || t.endedAt >= t.openingEnd;
+        // A tender ended because the buyer would not rule on a challenge forfeits nothing to the buyer.
+        bool windowCompleted = (!t.cancelled || t.endedAt >= t.openingEnd) && !t.stalled;
         return (!b.opened && windowCompleted && t.openedCount != 0) ? t.buyer : b.bidder;
+    }
+
+    /// @notice Pay out a challenge bond once the challenge is ruled on or the tender has ended. Anyone may call.
+    function claimBond(uint256 id, uint256 index) external nonReentrant {
+        Tender storage t = _tender(id);
+        if (index >= _challenges[id].length) revert NoSuchRecord();
+        Challenge storage c = _challenges[id][index];
+        if (c.bondPaid) revert AlreadyDone();
+        if (c.ruling == RULING_PENDING && !t.cancelled && !t.closed) revert WrongPhase();
+        c.bondPaid = true;
+        uint256 amount = c.bond;
+        if (c.ruling == RULING_REJECTED) {
+            // Not to the buyer: a buyer who profited from rejecting challenges would have a reason to reject them all.
+            feesAccrued += amount;
+            emit BondPaid(id, index, feeRecipient, amount);
+            return;
+        }
+        (bool ok, ) = c.challenger.call{value: amount}("");
+        if (!ok) revert PaymentFailed();
+        emit BondPaid(id, index, c.challenger, amount);
     }
 
     function withdrawFees() external nonReentrant {

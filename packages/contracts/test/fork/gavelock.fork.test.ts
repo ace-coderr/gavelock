@@ -329,11 +329,11 @@ describe("Gavelock on a fork of X Layer", () => {
     it("hears a challenge, records the buyer's reasoned ruling, and closes only after the standstill", async () => {
       await s.warpTo((await s.chainNow()) + 5);
       assert.equal(await s.phase(id), "Standstill");
-      await s.track("file a challenge", await s.gavelock.write.challenge([id, 0n, 0, "Item 2 (ISO 9001) is claimed but the certificate expired."], { account: bidders[1].account }));
+      await s.track("file a challenge", await s.gavelock.write.challenge([id, 0n, 0, "Item 2 (ISO 9001) is claimed but the certificate expired."], { account: bidders[1].account, value: DEPOSIT }));
       assert.equal((await s.gavelock.read.getTender([id])).openChallenges, 1);
-      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 3n, 0, "x"], { account: stranger.account })), /BadBid/); // never opened
-      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 0n, 2, "x"], { account: stranger.account })), /NoSuchRecord/);
-      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 0n, 0, ""], { account: stranger.account })), /BadLength/);
+      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 3n, 0, "x"], { account: stranger.account, value: DEPOSIT })), /BadBid/); // never opened
+      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 0n, 2, "x"], { account: stranger.account, value: DEPOSIT })), /NoSuchRecord/);
+      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 0n, 0, ""], { account: stranger.account, value: DEPOSIT })), /BadLength/);
       assert.match(await revertOf(s.gavelock.simulate.rule([id, 0n, false, "no"], { account: stranger.account })), /NotBuyer/);
       assert.match(await revertOf(s.gavelock.simulate.rule([id, 0n, false, ""], { account: buyer.account })), /BadLength/);
 
@@ -349,7 +349,7 @@ describe("Gavelock on a fork of X Layer", () => {
 
       assert.match(await revertOf(s.gavelock.simulate.close([id], { account: stranger.account })), /WrongPhase/);
       await s.warpTo(Number(still.standstillEnd));
-      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 1n, 1, "too late"], { account: stranger.account })), /WrongPhase/);
+      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 1n, 1, "too late"], { account: stranger.account, value: DEPOSIT })), /WrongPhase/);
       await s.track("close the tender", await s.gavelock.write.close([id], { account: stranger.account }));
       assert.equal(await s.phase(id), "Final");
       assert.match(await revertOf(s.gavelock.simulate.cancel([id, "regret"], { account: buyer.account })), /WrongPhase/);
@@ -364,6 +364,10 @@ describe("Gavelock on a fork of X Layer", () => {
         assert.equal((await s.pub.getBalance({ address: expected.account.address })) - before, DEPOSIT);
         assert.match(await revertOf(s.gavelock.simulate.claimDeposit([id, BigInt(index)], { account: stranger.account })), /AlreadyDone/);
       }
+      // The one challenge in this tender was ruled on; its bond is paid out the same way.
+      const bondBefore = await s.pub.getBalance({ address: bidders[1].account.address });
+      await s.track("claim a challenge bond", await s.gavelock.write.claimBond([id, 0n], { account: stranger.account }));
+      assert.equal((await s.pub.getBalance({ address: bidders[1].account.address })) - bondBefore, 0n, "a rejected challenge's bond is not returned");
       assert.equal(await s.pub.getBalance({ address: s.gavelock.address }), await s.gavelock.read.feesAccrued(), "only fees remain in the contract");
     });
 
@@ -483,7 +487,7 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.equal(tender.scoreCursor, 0);
       assert.equal(tender.awardedAt, 0n);
       assert.equal(await s.phase(id), "Evaluation");
-      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 1n, 0, "x"], { account: stranger.account })), /WrongPhase/);
+      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 1n, 0, "x"], { account: stranger.account, value: DEPOSIT })), /WrongPhase/);
       assert.match(await revertOf(s.gavelock.simulate.close([id], { account: stranger.account })), /WrongPhase/);
       await s.mined(await s.gavelock.write.finalize([id, 9n], { account: buyer.account })); // one bid short of all ten
       tender = await s.gavelock.read.getTender([id]);
@@ -509,8 +513,8 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.equal(first.winner, 1);
       await s.warpTo((await s.chainNow()) + 5);
 
-      await s.mined(await s.gavelock.write.challenge([id, 1n, 0, "Item 2 is claimed; the certificate is for another company."], { account: bidders[5].account }));
-      await s.mined(await s.gavelock.write.challenge([id, 7n, 1, "The ciphertext does not decrypt to the opened values."], { account: stranger.account }));
+      await s.mined(await s.gavelock.write.challenge([id, 1n, 0, "Item 2 is claimed; the certificate is for another company."], { account: bidders[5].account, value: DEPOSIT }));
+      await s.mined(await s.gavelock.write.challenge([id, 7n, 1, "The ciphertext does not decrypt to the opened values."], { account: stranger.account, value: DEPOSIT }));
       await s.track("rule on a challenge (upheld)", await s.gavelock.write.rule([id, 0n, true, "Confirmed with the certifier."], { account: buyer.account }));
 
       let tender = await s.gavelock.read.getTender([id]);
@@ -522,7 +526,7 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.equal((await s.gavelock.read.getBid([id, 1n])).disqualified, true);
       assert.equal(await s.phase(id), "Standstill");
       assert.match(await revertOf(s.gavelock.simulate.close([id], { account: stranger.account })), /WrongPhase/);
-      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 5n, 0, "x"], { account: stranger.account })), /WrongPhase/);
+      assert.match(await revertOf(s.gavelock.simulate.challenge([id, 5n, 0, "x"], { account: stranger.account, value: DEPOSIT })), /WrongPhase/);
 
       // Recompute with several page sizes: identical again, and equal to the reference without bid 1.
       const { award } = await s.referenceAward(id, rule.table);
@@ -679,19 +683,11 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.equal(getAddress(await s.gavelock.read.depositRecipient([id, 1n])), getAddress(buyer.account.address));
     });
 
-    it("a tender needs no deposit if the buyer sets none", async () => {
-      const { id, t } = await s.createTender({ buyer, rule: "lowest-price", deposit: 0n });
-      await s.warpTo(Number(t.biddingStart));
-      const one = await s.submitBid(id, bidders[0], { price: 5_000n }, 0n);
-      assert.match(await revertOf(s.gavelock.simulate.submitBid([id, salt(6), "0x01"], { account: bidders[1].account, value: 1n })), /WrongValue/);
-      await s.warpTo(Number(t.deadline));
-      await s.mined(await s.openBid(id, one, stranger));
-      await toOpeningEnd(t);
-      await s.mined(await s.gavelock.write.finalize([id, 10n], { account: stranger.account }));
-      const after = await s.gavelock.read.getTender([id]);
-      await s.warpTo(Number(after.standstillEnd));
-      await s.mined(await s.gavelock.write.close([id], { account: stranger.account }));
-      await s.mined(await s.gavelock.write.claimDeposit([id, 0n], { account: stranger.account }));
+    it("refuses a tender whose deposit is below the minimum, so slots cannot be filled for free", async () => {
+      const now = await s.chainNow();
+      const params = { quick: false, ruleId: s.rules["lowest-price"].id, clarificationsStart: 0n, biddingStart: BigInt(now + HOUR), deadline: BigInt(now + 2 * HOUR), openingWindow: HOUR, commitWindow: 0, revealWindow: 0, standstill: HOUR, bidDeposit: parseEther("0.001") - 1n, checklistItems: 0, mandatoryMask: 0, preferredAMask: 0, preferredBMask: 0, priceLadderBps: [0, 250, 500, 1000, 1500, 2500, 4000], deliveryLadderDays: [7, 14, 30], abnormalFloorBps: 7000, panel: [] as string[], quorum: 0, terms: "0x7b7d" as Hex };
+      assert.match(await revertOf(s.gavelock.simulate.createTender([params], { account: buyer.account, value: TENDER_FEE })), /BadDeposit/);
+      assert.equal(await revertOf(s.gavelock.simulate.createTender([{ ...params, bidDeposit: parseEther("0.001") }], { account: buyer.account, value: TENDER_FEE })), "");
     });
   });
 

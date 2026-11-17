@@ -6,7 +6,7 @@ import fs from "node:fs";
 import { after, before, describe, it } from "node:test";
 import { bytesToHex, formatEther, type Hex } from "viem";
 import { openingHint, type OpenedBid } from "@gavelock/core";
-import { CHECKLIST, GAS_PRICE, deploySystem, type RuleKey, type System } from "./system.ts";
+import { CHECKLIST, DEPOSIT, GAS_PRICE, deploySystem, type RuleKey, type System } from "./system.ts";
 
 const salt = (n: number) => `0x${n.toString(16).padStart(64, "0")}` as Hex;
 const priceBand = (ruleInput: number) => ruleInput & 7;
@@ -212,7 +212,7 @@ describe("the abnormally low bid rule on a fork of X Layer", () => {
       // Remove three bids above the median, so the median falls. Challenges can only be filed while the
       // award stands, so all three are filed first and then ruled on.
       for (const target of [0, 9, 7]) {
-        await s.mined(await s.gavelock.write.challenge([id, BigInt(target), 0, "False compliance claim."], { account: stranger.account }));
+        await s.mined(await s.gavelock.write.challenge([id, BigInt(target), 0, "False compliance claim."], { account: stranger.account, value: DEPOSIT }));
       }
       for (let k = 0; k < 3; k++) {
         await s.mined(await s.gavelock.write.rule([id, BigInt(k), true, "Confirmed."], { account: buyer.account }));

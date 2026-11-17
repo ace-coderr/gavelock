@@ -62,7 +62,7 @@ export function Studio() {
     if (!/^\d+$/.test(ruleId)) out.push('Choose the scoring rule.');
     const minutes = { clarMinutes, bidMinutes, openMinutes, standMinutes, ...(usePanel ? { commitMinutes, revealMinutes } : {}) };
     for (const [name, v] of Object.entries(minutes)) if (!/^\d+$/.test(v) || Number(v) < 1) out.push(`${name.replace('Minutes', '')} needs a whole number of minutes, at least 1.`);
-    if (!/^\d*\.?\d+$/.test(deposit)) out.push('The deposit must be an amount in OKB, for example 0.001.');
+    if (!/^\d*\.?\d+$/.test(deposit) || Number(deposit) < 0.001) out.push('The deposit must be an amount in OKB of at least 0.001. It also sets the bond for challenges, and it keeps anyone from filling the tender with junk bids.');
     if (!/^\d+(\.\d+)?$/.test(floor) || Number(floor) > 100) out.push('The abnormally-low floor must be a percentage from 0 to 100.');
     for (const a of panel) if (!isAddress(a)) out.push(`${a} is not an address.`);
     if (new Set(panel.map((a) => a.toLowerCase())).size !== panel.length) out.push('A panel member is listed twice.');
@@ -180,7 +180,7 @@ export function Studio() {
           {usePanel && <Field label="Panel reveal window">{text(revealMinutes, setRevealMinutes, { inputMode: 'numeric' })}</Field>}
           <Field label="Standstill (challenges)">{text(standMinutes, setStandMinutes, { inputMode: 'numeric' })}</Field>
         </div>
-        <Field label="Bid deposit (OKB)" hint="Returned to every bidder who opens their bid. Forfeited to you if a bid is never opened.">{text(deposit, setDeposit, { inputMode: 'decimal' })}</Field>
+        <Field label="Bid deposit (OKB)" hint="At least 0.001. Returned to every bidder who opens their bid; forfeited to you if a bid is never opened. Also the bond for challenges. A tender takes at most 200 bids.">{text(deposit, setDeposit, { inputMode: 'decimal' })}</Field>
       </section>
 
       {!quick && (

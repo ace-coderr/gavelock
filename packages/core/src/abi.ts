@@ -44,6 +44,11 @@ export const gavelockAbi = [
   },
   {
     "inputs": [],
+    "name": "BadDeposit",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "BadHint",
     "type": "error"
   },
@@ -130,6 +135,11 @@ export const gavelockAbi = [
   {
     "inputs": [],
     "name": "Reentered",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TenderFull",
     "type": "error"
   },
   {
@@ -270,6 +280,37 @@ export const gavelockAbi = [
       }
     ],
     "name": "BidSealed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tenderId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "BondPaid",
     "type": "event"
   },
   {
@@ -520,6 +561,19 @@ export const gavelockAbi = [
   },
   {
     "inputs": [],
+    "name": "MAX_BIDS",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "MAX_PANEL",
     "outputs": [
       {
@@ -534,6 +588,19 @@ export const gavelockAbi = [
   {
     "inputs": [],
     "name": "MAX_WINDOW",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MIN_DEPOSIT",
     "outputs": [
       {
         "internalType": "uint256",
@@ -801,7 +868,7 @@ export const gavelockAbi = [
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -834,6 +901,24 @@ export const gavelockAbi = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "claimBond",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1277,6 +1362,16 @@ export const gavelockAbi = [
             "internalType": "address",
             "name": "rulingReason",
             "type": "address"
+          },
+          {
+            "internalType": "uint96",
+            "name": "bond",
+            "type": "uint96"
+          },
+          {
+            "internalType": "bool",
+            "name": "bondPaid",
+            "type": "bool"
           }
         ],
         "internalType": "struct Gavelock.Challenge",
@@ -1533,6 +1628,11 @@ export const gavelockAbi = [
             "internalType": "address",
             "name": "cancelReason",
             "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "stalled",
+            "type": "bool"
           }
         ],
         "internalType": "struct Tender",

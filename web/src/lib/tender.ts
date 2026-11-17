@@ -69,6 +69,7 @@ export interface ChallengeRecord {
   ruledBlock: bigint;
   reason: string;
   rulingReason: string | null;
+  bondPaid: boolean;
 }
 
 export interface TenderDetail {
@@ -138,7 +139,7 @@ export async function readTender(id: bigint): Promise<TenderDetail | null> {
     qRows.map(async (q, index) => ({ index, asker: q.asker, askedBlock: q.askedBlock, text: await readText(q.text).catch(() => '(unreadable)'), answer: q.answeredBlock !== 0n ? await readText(q.answer).catch(() => '(unreadable)') : null, answeredBlock: q.answeredBlock })),
   );
   const challenges: ChallengeRecord[] = await Promise.all(
-    cRows.map(async (c, index) => ({ index, challenger: c.challenger, bidIndex: c.bidIndex, kind: c.kind, ruling: c.ruling, filedBlock: c.filedBlock, ruledBlock: c.ruledBlock, reason: await readText(c.reason).catch(() => '(unreadable)'), rulingReason: c.ruling !== 0 ? await readText(c.rulingReason).catch(() => '(unreadable)') : null })),
+    cRows.map(async (c, index) => ({ index, challenger: c.challenger, bidIndex: c.bidIndex, kind: c.kind, ruling: c.ruling, bondPaid: c.bondPaid, filedBlock: c.filedBlock, ruledBlock: c.ruledBlock, reason: await readText(c.reason).catch(() => '(unreadable)'), rulingReason: c.ruling !== 0 ? await readText(c.rulingReason).catch(() => '(unreadable)') : null })),
   );
   const cancelReason = raw.cancelled ? await readText(raw.cancelReason).catch(() => null) : null;
   return { id, phase: PHASES[Number(phase)] ?? 'Published', raw, terms, panel: [...panel], bids, documents, questions, challenges, cancelReason };

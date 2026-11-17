@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { encodeFunctionData } from 'viem';
 import { gavelockAbi, openingHint, QUICKNET, roundTime, type Bid, type Checklist, type OpenedBid } from '@gavelock/core';
 import { shortAddress } from '../../lib/format.ts';
@@ -14,6 +14,24 @@ type Unsealed = { state: 'working' } | { state: 'ready'; bid: Bid } | { state: '
 
 function BidRow({ tender, bid, onChanged }: { tender: TenderDetail; bid: BidRecord; onChanged: () => void }) {
   const [unsealed, setUnsealed] = useState<Unsealed | null>(null);
+  // The ciphertext names the drand round it is sealed to, and that can be read at any time. A bid sealed to a
+  // later round than the tender's cannot be opened by others at the deadline: its owner could then choose,
+  // after seeing the other bids, whether to open it. That is flagged here for everyone to see, and it can be challenged.
+  const [header, setHeader] = useState<'checking' | 'ok' | 'wrong-round' | 'not-a-seal'>('checking');
+  useEffect(() => {
+    let live = true;
+    Promise.all([fetchCiphertext(bid.ciphertext), import('@gavelock/core/seal')])
+      .then(([bytes, { sealHeader }]) => {
+        const h = sealHeader(bytes);
+        if (live) setHeader(!h ? 'not-a-seal' : h.round === Number(tender.raw.drandRound) ? 'ok' : 'wrong-round');
+      })
+      .catch(() => {
+        if (live) setHeader('checking');
+      });
+    return () => {
+      live = false;
+    };
+  }, [bid.ciphertext, tender.raw.drandRound]);
   const roundIsPublic = Date.now() / 1000 >= roundTime(Number(tender.raw.drandRound));
 
   async function unseal() {
@@ -48,6 +66,8 @@ function BidRow({ tender, bid, onChanged }: { tender: TenderDetail; bid: BidReco
         <h3 className="card__title">Bid {bid.index + 1} <span className="mono" style={{ color: 'var(--color-text-faint)' }}>{shortAddress(bid.bidder)}</span></h3>
         <span className={`status ${bid.opened ? 'status--ok' : 'status--pending'}`}>{bid.disqualified ? 'Disqualified' : bid.opened ? 'Opened' : 'Sealed'}</span>
       </div>
+      {header === 'wrong-round' && <p className="notice notice--danger" role="alert">This bid is sealed to a different drand round from the tender’s. Others cannot open it at the deadline, so its owner can decide whether to open it after seeing the other bids. It can be challenged as a seal mismatch.</p>}
+      {header === 'not-a-seal' && <p className="notice notice--danger" role="alert">The stored bytes are not a time-lock ciphertext, so only the owner of this bid can ever open it. It can be challenged as a seal mismatch.</p>}
       {bid.opened ? (
         <dl className="facts">
           <div className="fact"><dt className="fact__label">Price (minor units)</dt><dd className="fact__value mono">{bid.price.toString()}</dd></div>

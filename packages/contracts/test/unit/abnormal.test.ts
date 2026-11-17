@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { before, describe, it } from "node:test";
 import { NO_GATES, STARTER_RULES, truthTable, type RuleSpec } from "@gavelock/core";
-import { CHECKLIST, HOUR, deployLocal, type Local, type PlannedBid } from "./local.ts";
+import { CHECKLIST, DEPOSIT, HOUR, deployLocal, type Local, type PlannedBid } from "./local.ts";
 
 const FLOOR = 7000;
 const lowestPrice = truthTable(STARTER_RULES[0]!.spec);
@@ -178,7 +178,7 @@ describe("the abnormally low bid rule", () => {
     assert.deepEqual([state.median, state.lowest], ["950", "900"]);
     assert.deepEqual(state.bids.map((b) => b.abnormallyLow), [true, false, false, false]); // 650 < 70% of 950
 
-    await s.mined(await s.gavelock.write.challenge([id, 3n, 0, "False claim."], { account: s.stranger.account }));
+    await s.mined(await s.gavelock.write.challenge([id, 3n, 0, "False claim."], { account: s.stranger.account, value: DEPOSIT }));
     await s.mined(await s.gavelock.write.rule([id, 0n, true, "Confirmed."], { account: s.buyer.account }));
     const pending = await s.awardState(id);
     assert.deepEqual([pending.winner, pending.median, pending.lowest, pending.generation, pending.compliantCount], [null, "0", "0", 1, 3]);
@@ -202,7 +202,7 @@ describe("the abnormally low bid rule", () => {
     assert.equal(priceBand(state.bids[1]!.ruleInput), 6, "900 is re-banded against the new reference");
 
     // Disqualify once more: two compliant bids left, so the rule switches off altogether.
-    await s.mined(await s.gavelock.write.challenge([id, 2n, 0, "False claim."], { account: s.stranger.account }));
+    await s.mined(await s.gavelock.write.challenge([id, 2n, 0, "False claim."], { account: s.stranger.account, value: DEPOSIT }));
     await s.mined(await s.gavelock.write.rule([id, 1n, true, "Confirmed."], { account: s.buyer.account }));
     await s.finalizePaged(id, [1]);
     ({ state } = await s.assertMatchesCore(id, lowestPrice));
@@ -215,7 +215,7 @@ describe("the abnormally low bid rule", () => {
       const { id } = await s.readyTender([{ price: 300n }, { price: 900n }, { price: 1000n }, { price: 1100n }, { price: 250n }], FLOOR, { hints: "exact" });
       await s.finalizePaged(id, [3]);
       await s.assertMatchesCore(id, lowestPrice);
-      await s.mined(await s.gavelock.write.challenge([id, BigInt(target), 1, "Seal mismatch."], { account: s.stranger.account }));
+      await s.mined(await s.gavelock.write.challenge([id, BigInt(target), 1, "Seal mismatch."], { account: s.stranger.account, value: DEPOSIT }));
       await s.mined(await s.gavelock.write.rule([id, 0n, true, "Confirmed."], { account: s.buyer.account }));
       await s.finalizePaged(id, [2], [s.other, s.stranger]);
       const { state } = await s.assertMatchesCore(id, lowestPrice);
