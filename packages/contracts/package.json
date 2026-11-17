@@ -9,7 +9,7 @@
     "compile": "hardhat compile",
     "typecheck": "tsc -p tsconfig.json",
     "test": "hardhat test nodejs test/unit/evalFailure.test.ts test/unit/abnormal.test.ts",
-    "test:fork": "hardhat test nodejs test/fork/tapeout.fork.test.ts test/fork/ruleStock.fork.test.ts test/fork/gavelock.fork.test.ts"
+    "test:fork": "hardhat test nodejs test/fork/tapeout.fork.test.ts test/fork/ruleStock.fork.test.ts test/fork/gavelock.fork.test.ts test/fork/abnormal.fork.test.ts"
   },
   "dependencies": {
     "@gavelock/core": "*"

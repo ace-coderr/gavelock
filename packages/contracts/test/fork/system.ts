@@ -83,6 +83,21 @@ export async function deploySystem() {
     await test.mine({ blocks: 1 });
   };
 
+  // ---------------------------------------------------------------- extra bidders
+  /** A funded account at a made-up address, for tenders with more bidders than the fork has keys. */
+  const extraBidders = new Map<number, any>();
+  async function extraBidder(n: number) {
+    let wallet = extraBidders.get(n);
+    if (!wallet) {
+      const address = `0x${(0xb1d0000 + n).toString(16).padStart(40, "0")}` as Address;
+      await test.impersonateAccount({ address });
+      await test.setBalance({ address, value: parseEther("1") });
+      wallet = await viem.getWalletClient(address);
+      extraBidders.set(n, wallet);
+    }
+    return wallet;
+  }
+
   // ---------------------------------------------------------------- gas ledger
   const gas: { step: string; gas: bigint }[] = [];
   const track = async (step: string, hash: Hex) => {
@@ -142,13 +157,13 @@ export async function deploySystem() {
 
   type Sealed = { index: bigint; bidder: any; bid: Bid; commitment: Hex; ciphertext: Hex };
   /** Seal a bid in the way the app does and submit it. */
-  async function submitBid(id: bigint, bidder: any, fields: Partial<Bid> & { price: bigint }, deposit = DEPOSIT): Promise<Sealed> {
+  async function submitBid(id: bigint, bidder: any, fields: Partial<Bid> & { price: bigint }, deposit = DEPOSIT, label = "submit a sealed bid"): Promise<Sealed> {
     const t = await gavelock.read.getTender([id]);
     const bid: Bid = { deliveryDays: 10, compliance: 0b00011, note: "", salt: randomSalt(), ...fields };
     const commitment = commitmentOf({ chainId: 196, contract: gavelock.address, tenderId: id, bidder: bidder.account.address }, bid);
     const ciphertext = bytesToHex(await seal(encodeBid(bid), Number(t.drandRound)));
     const index = (await gavelock.read.bidCount([id])) as bigint;
-    await track("submit a sealed bid", await gavelock.write.submitBid([id, commitment, ciphertext], { account: bidder.account, value: deposit }));
+    await track(label, await gavelock.write.submitBid([id, commitment, ciphertext], { account: bidder.account, value: deposit }));
     return { index, bidder, bid, commitment, ciphertext };
   }
 
@@ -202,7 +217,7 @@ export async function deploySystem() {
     return Buffer.from(((await gavelock.read.read([t.cancelReason])) as Hex).slice(2), "hex").toString("utf8");
   };
 
-  return { ...fork, stock, engine, gavelock, panel, records, rules, deployer, feeRecipient, chainNow, warpTo, gas, track, createTender, submitBid, openBid, scoreCommitment, referenceAward, phase, cancelReason, getAddress };
+  return { ...fork, stock, engine, gavelock, panel, records, rules, deployer, feeRecipient, chainNow, warpTo, gas, track, createTender, submitBid, openBid, extraBidder, scoreCommitment, referenceAward, phase, cancelReason, getAddress };
 }
 
 export type System = Awaited<ReturnType<typeof deploySystem>>;

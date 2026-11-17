@@ -56,6 +56,18 @@ Deploy order this implies for Gate B: deploy `RuleStock`, approve it for 0.11 BE
 
 Still to build in Task 3: the tender contract (lifecycle, documents and ciphertexts as contract code, panel commit-reveal, paged finalize, challenges, pull refunds), its tests, and the measurements for conditions 2 and 3.
 
+## Abnormally low bid rule (added to Task 3)
+
+Specified in `packages/core` (`banding.ts`, `award.ts`), implemented in the contracts, 78 core tests and 25 contract unit tests pass.
+
+- Per-tender parameter `abnormalFloorBps` (default 7000, 0 = off, at most 10,000), frozen with the other parameters. Compliant bids = opened, not disqualified, every mandatory item claimed. Median compliant price: even count = mean of the middle two, rounded down. Abnormally low = `price * 10000 < median * floor`. Needs at least 3 compliant bids.
+- The reference price is the lowest compliant price that is not abnormally low. A flagged bid stays eligible, gets price band 0 and a public flag (`getBid(...).abnormallyLow`).
+- Compliant bids are kept in a price-ordered linked list as they are opened. `openBid` takes a `hint` (index + 1 of any listed bid that sorts before the new one, or 0). A hint only saves gas; one that is not listed or does not sort before the bid reverts, and no hint can change the order. Core helper: `openingHint`.
+- `finalize` stages: 1 walk to the median, 2 skip the flagged prefix, 3 score. Paged, any caller; an upheld challenge unlinks the bid and restarts at stage 0 through the same path.
+- Size: the award logic moved to a linked library `AwardEngine` (7,517 bytes). `Gavelock` is 18,986 bytes (limit 24,576). Deploy order: `AwardEngine`, then `Gavelock` linked to it. Shared structs are in `Types.sol`.
+- Honest limit recorded in `docs/PROTOCOL.md` section 8: several fake low bids can still move the median.
+- Fork results and gas at 3, 10 and 50 bids: see `packages/contracts/reports/` once the fork suite has finished.
+
 ## Decisions made in Task 2 (the contract must match these exactly)
 
 The TypeScript in `packages/core` is the specification; contract tests compare the two.

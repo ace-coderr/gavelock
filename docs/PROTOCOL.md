@@ -215,6 +215,7 @@ in the bidder and panel wallets.
 - BEM token and the opener, SiteRegistry and DomainBinding proxies: controlled by TapeOut. They affect setup cost and the DeWEB copy of the site, not tenders.
 - drand quicknet: a bid is sealed until the League of Entropy publishes the round. If the network halted, bids could not be opened; they would be void and deposits handled by the tender's own rules.
 - After opening, bids are public.
+- Abnormally low bids: the rule (a compliant bid below `abnormalFloorBps` of the median compliant price cannot be the price reference) stops **one** fake lowball from flattening everyone else's price band. It does **not** stop several. Wallets are free, so a buyer-aligned party can submit enough fake low bids to move the median itself, and then a further fake bid is no longer "abnormal". The deposit is the only cost of each fake bid, and it is returned once the fake bid is opened. A tender with a large bid deposit and a mandatory checklist that is hard to fake is harder to attack this way; the rule is a mitigation, not a proof.
 
 ## 9. Changes to the plan (decided at Gate A, 16 November 2026)
 
