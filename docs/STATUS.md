@@ -29,7 +29,7 @@ https://ace-coderr.github.io/gavelock/ is deployed by `.github/workflows/deploy.
 ## Gates
 
 - Gate A (cost table): **approved** 16 November 2026. Nothing has been spent.
-- Gate B (mainnet deploy): **table ready, waiting for approval**: docs/GATE-B.md (fees re-read 17 November; buy 0.12 BEM; hold about 0.06 OKB in total). BEM is bought by the owner at Gate B, not before. At Gate B: re-read the live fees, say exactly where to swap and how much.
+- Gate B (mainnet deploy): **two options ready, neither approved**: full (docs/GATE-B.md, about 0.06 OKB) and lean (docs/GATE-B-LEAN.md, one rule, about 0.025 OKB). Both need 0.12 BEM. No deploy key exists. Other rules can be added later with `scripts/add-rules.ts`.
 - Gate C (DeWEB dry run): **dry run done, waiting for approval**: docs/GATE-C.md.
 
 ## Conditions set at Gate A (binding for Task 3)

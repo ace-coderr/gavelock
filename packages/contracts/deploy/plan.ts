@@ -13,6 +13,8 @@ export interface DeployParams {
   /// OKB per full tender. A Quick Quote is free.
   tenderFee: bigint;
   supply: bigint;
+  /// Starter rules to tape out now, by key. Others can be added later with scripts/add-rules.ts.
+  rules: readonly string[];
   name: string;
   symbol: string;
   story: string;
@@ -119,7 +121,7 @@ export async function preflight(ctx: Context, params: DeployParams): Promise<Pre
   // The tape-out fee is a constant of the circuits implementation: read it from a live processor.
   const live = await pub.readContract({ address: TAPEOUT.factory, abi: parseAbi(["function cpuAt(uint256) view returns (address)"]), functionName: "cpuAt", args: [0n] });
   const tapeoutFee = await pub.readContract({ address: live, abi: circuitsAbi, functionName: "TAPEOUT_FEE" });
-  const rules = BigInt(STARTER_RULES.length);
+  const rules = BigInt(STARTER_RULES.filter((r) => params.rules.includes(r.key)).length);
   return { chainId, bem, deployFee, mintFee, tapeoutFee, factorySealed: sealed, factoryOwner: owner, balanceOkb, balanceBem, bemNeeded: deployFee + mintFee, okbFeesNeeded: rules * (tapeoutFee + params.ruleFee) };
 }
 
@@ -165,7 +167,7 @@ export async function deployAll(ctx: Context, params: DeployParams, state: State
 
   // 3. The four starter rules, each compiled from its definition and proven equal to its table before it is sent.
   state.rules ??= {};
-  for (const rule of STARTER_RULES) {
+  for (const rule of STARTER_RULES.filter((r) => params.rules.includes(r.key))) {
     if (state.rules[rule.key] !== undefined) continue;
     const table = truthTable(rule.spec);
     const compiled = compileRule(table);
@@ -207,7 +209,7 @@ export async function verifyDeployment(ctx: Context, params: DeployParams, state
   const transistors = state.transistors!;
   const tAbi = parseAbi(["function supplyCap() view returns (uint256)", "function minted() view returns (uint256)", "function mintPrice() view returns (uint256)", "function balanceOf(address,uint256) view returns (uint256)"]);
   const burned = BigInt(
-    STARTER_RULES.reduce((n, r) => n + compileRule(truthTable(r.spec)).gates, 0),
+    STARTER_RULES.filter((r) => state.rules![r.key] !== undefined).reduce((n, r) => n + compileRule(truthTable(r.spec)).gates, 0),
   );
   add("the processor is registered with the TapeOut factory", await read<boolean>(TAPEOUT.factory, parseAbi(["function isCPU(address) view returns (bool)"]) as Abi, "isCPU", [state.processor!]));
   add("the supply cap equals the supply", (await read<bigint>(transistors, tAbi as Abi, "supplyCap")) === params.supply);
@@ -229,7 +231,7 @@ export async function verifyDeployment(ctx: Context, params: DeployParams, state
   }
 
   // Every starter rule: all 2,048 outputs from the chain equal the truth table made from its definition.
-  for (const rule of STARTER_RULES) {
+  for (const rule of STARTER_RULES.filter((r) => state.rules![r.key] !== undefined)) {
     const id = state.rules![rule.key]!;
     const table = truthTable(rule.spec);
     let bad = 0;

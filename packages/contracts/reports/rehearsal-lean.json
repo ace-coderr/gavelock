@@ -1,0 +1,208 @@
+{
+  "forkBlock": 76155264,
+  "params": {
+    "ruleFee": "700000000000000",
+    "tenderFee": "1000000000000000",
+    "supply": "100000000",
+    "name": "Gavelock",
+    "symbol": "GAVEL",
+    "story": "Tamper-proof tenders and quote requests. Every scoring rule is a circuit taped out on this processor, and an award is computed by calling it.",
+    "rules": [
+      "price-60-quality-40"
+    ],
+    "feeRecipient": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8"
+  },
+  "preflight": {
+    "chainId": 196,
+    "bem": "0x60e62Efa9405d6873C5deaBD4E6CC91c25363952",
+    "deployFee": "10000000",
+    "mintFee": "1000000",
+    "tapeoutFee": "1300000000000000",
+    "factorySealed": false,
+    "factoryOwner": "0xB3D85b42A045c1A88D800CAD0F55d2566a4D3138",
+    "balanceOkb": "10000000000000000000000",
+    "balanceBem": "12000000",
+    "bemNeeded": "11000000",
+    "okbFeesNeeded": "2000000000000000"
+  },
+  "state": {
+    "stock": "0x9E545E3C0baAB3E08CdfD552C960A1050f373042",
+    "processor": "0x804F00c9FDecBF32C38a73D6b304617D292DcE0f",
+    "transistors": "0x9C85969C44076e1B7932d3Bed2Af142FA2CCfC72",
+    "opened": true,
+    "rules": {
+      "price-60-quality-40": 1
+    },
+    "engine": "0xf5059a5D33d5853360D16C683c16e67980206f36",
+    "gavelock": "0x95401dc811bb5740090279Ba06cfA8fcF6113778",
+    "panel": "0x3fA4E6e03Fbd434A577387924aF39efd3b4b50F2",
+    "records": "0xf72aa51B6350C18966923073d3609e1356a3fbBA"
+  },
+  "ledger": [
+    {
+      "step": "deploy RuleStock",
+      "hash": "0x11cd8045cb7e78ed38ba91d9e9c6000c7a9a497a683c45b0558d1872a47bf19a",
+      "gas": "2092620",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasPriceWei": "19534255"
+    },
+    {
+      "step": "approve the fee token for the stock",
+      "hash": "0x2774e642ea5ed28e07cf79f2cc31945f0e8b628a957e6cb2337e19023ea80a10",
+      "gas": "46393",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasPriceWei": "19460790"
+    },
+    {
+      "step": "open the stock: create the processor and mint the whole supply",
+      "hash": "0x7eee07e922b3137949544782de0a8e4bbf73291d1e52c151ecd0b61fc32f80ea",
+      "gas": "1028242",
+      "valueWei": "0",
+      "bemUnits": "11000000",
+      "gasPriceWei": "19383051"
+    },
+    {
+      "step": "tape out \"Price 60 / Quality 40\" (141 NAND)",
+      "hash": "0x8d1570635f86ec6069c3bdab53512e5cc09315c061a3a0e108458e785a72a1b4",
+      "gas": "812858",
+      "valueWei": "2000000000000000",
+      "bemUnits": "0",
+      "gasPriceWei": "19307797"
+    },
+    {
+      "step": "deploy AwardEngine",
+      "hash": "0xc27e9eb19e54ef004969e9f982e1cbc3a85602655f2200aa7979c2a0f1a5c912",
+      "gas": "1678433",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasPriceWei": "19232360"
+    },
+    {
+      "step": "deploy Gavelock (with its panel and records contracts)",
+      "hash": "0xaba4aa0f5d547930b2a8ea0feccbfc62be62f2512ceae34f52e2d72a5497cc9d",
+      "gas": "6756247",
+      "valueWei": "0",
+      "bemUnits": "0",
+      "gasPriceWei": "19159120"
+    }
+  ],
+  "checks": [
+    {
+      "check": "the processor is registered with the TapeOut factory",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the supply cap equals the supply",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the whole supply was minted (nobody can mint more)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the mint price is 0",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the stock holds the supply minus the gates burned by the starter rules",
+      "ok": true,
+      "detail": "99999859 of 100000000"
+    },
+    {
+      "check": "the fee recipient is set",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the rule fee is set",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the tender fee is set",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the tender contract reads the stock's processor",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "the tender contract points at this stock",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Gavelock is under the code size limit",
+      "ok": true,
+      "detail": "20220 bytes"
+    },
+    {
+      "check": "TenderPanel is under the code size limit",
+      "ok": true,
+      "detail": "4608 bytes"
+    },
+    {
+      "check": "TenderRecords is under the code size limit",
+      "ok": true,
+      "detail": "5696 bytes"
+    },
+    {
+      "check": "RuleStock is under the code size limit",
+      "ok": true,
+      "detail": "8420 bytes"
+    },
+    {
+      "check": "AwardEngine is under the code size limit",
+      "ok": true,
+      "detail": "7517 bytes"
+    },
+    {
+      "check": "Gavelock has no owner()",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Gavelock has no transferOwnership()",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Gavelock has no upgradeTo()",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Gavelock has no upgradeToAndCall()",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Gavelock has no pause()",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "Gavelock has no setFee()",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "check": "rule \"Price 60 / Quality 40\" (circuit 1) matches its definition on all 2048 inputs",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "totals": {
+    "gas": "12414793",
+    "okbFees": "2000000000000000",
+    "bemUnits": "11000000"
+  }
+}

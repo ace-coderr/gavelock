@@ -9,7 +9,7 @@ import { network } from "hardhat";
 import { formatEther, parseAbi, toHex, type Address, type Hex } from "viem";
 import { TAPEOUT } from "@gavelock/core";
 import { deployAll, preflight, type Context, type DeployParams, type State } from "../deploy/plan.ts";
-import { PROPOSED } from "../deploy/proposed.ts";
+import { profileFromEnv } from "../deploy/profiles.ts";
 
 const CHUNK = 24_000;
 const AREA = 2; // X Layer's chain code in TapeOut names
@@ -42,7 +42,9 @@ const { viem } = connection;
 const pub = await viem.getPublicClient();
 const test = await viem.getTestClient();
 const [deployer, recipient] = await viem.getWalletClients();
-const params: DeployParams = { ...PROPOSED, feeRecipient: recipient!.account.address };
+const { name: profileName, profile } = profileFromEnv();
+const params: DeployParams = { ruleFee: profile.ruleFee, tenderFee: profile.tenderFee, supply: profile.supply, name: profile.name, symbol: profile.symbol, story: profile.story, rules: profile.rules, feeRecipient: recipient!.account.address };
+console.log(`profile: ${profileName} (${profile.rules.length} rule(s))`);
 
 // Fork only: the fee token the real wallet must hold.
 const HOLDER: Address = "0x571d447f4f24688eC35Ccf07f1D6993655F6aF15";
@@ -59,7 +61,7 @@ const processorsBefore = await pub.readContract({ address: TAPEOUT.factory, abi,
 await preflight(ctx, params);
 await deployAll(ctx, params, state);
 const processor = state.processor!;
-const circuitId = BigInt(state.rules!["lowest-price"]!); // the deploy wallet owns the starter rules it taped out
+const circuitId = BigInt(Object.values(state.rules!)[0]!); // the deploy wallet owns the starter rules it taped out
 const name = `${circuitId}.${AREA}.${processorsBefore}.tape`;
 
 const rows: { step: string; gas: bigint; okb: bigint }[] = [];

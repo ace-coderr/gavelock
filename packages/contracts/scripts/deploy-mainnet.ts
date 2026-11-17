@@ -1,12 +1,13 @@
 // The real deployment to X Layer mainnet. It spends the deploy wallet's OKB and BEM.
 //
 //   node --env-file=.env packages/contracts/scripts/deploy-mainnet.ts
+//   DEPLOY_PROFILE=lean node --env-file=.env packages/contracts/scripts/deploy-mainnet.ts   (the cut-down variant)
 //
 // It refuses to run unless ALL of these hold:
 //   1. DEPLOY_KEY is set (in a gitignored .env; it is never printed or logged).
 //   2. CONFIRM_MAINNET is exactly "I_APPROVED_THE_GATE_B_TABLE".
-//   3. packages/contracts/deploy/approved.json exists and its fees match the live TapeOut fees
-//      and the parameters below. If TapeOut changed a fee since approval, it stops.
+//   3. packages/contracts/deploy/approved.json exists, names the same profile ("full" or "lean") and the same
+//      rules, and its fees match the live TapeOut fees and the profile's numbers. If TapeOut changed a fee since approval, it stops.
 //   4. The deploy wallet holds enough OKB and BEM.
 // It resumes safely: a re-run skips every step the state file records as done.
 import fs from "node:fs";
@@ -14,7 +15,7 @@ import { createPublicClient, createWalletClient, fallback, formatEther, http, de
 import { privateKeyToAccount } from "viem/accounts";
 import { XLAYER } from "@gavelock/core";
 import { deployAll, preflight, verifyDeployment, type Context, type DeployParams, type State } from "../deploy/plan.ts";
-import { PROPOSED } from "../deploy/proposed.ts";
+import { profileFromEnv } from "../deploy/profiles.ts";
 
 const here = (p: string) => new URL(p, import.meta.url);
 const fail = (message: string): never => {
@@ -35,6 +36,8 @@ const wallet = createWalletClient({ account, chain, transport });
 
 interface Approved {
   approvedAt: string;
+  profile: string;
+  rules: string[];
   feeRecipient: `0x${string}`;
   deployFeeUnits: string;
   mintFeeUnits: string;
@@ -44,8 +47,10 @@ interface Approved {
   supply: string;
 }
 const approved: Approved = JSON.parse(fs.readFileSync(here("../deploy/approved.json"), "utf8"));
-const params: DeployParams = { ...PROPOSED, feeRecipient: approved.feeRecipient };
-if (params.ruleFee.toString() !== approved.ruleFeeWei || params.tenderFee.toString() !== approved.tenderFeeWei || params.supply.toString() !== approved.supply) fail("deploy/proposed.ts no longer matches deploy/approved.json.");
+const { name: profileName, profile } = profileFromEnv();
+if (approved.profile !== profileName || approved.rules.join(",") !== profile.rules.join(",")) fail(`approved.json approves profile "${approved.profile}" with rules [${approved.rules}], not "${profileName}" with [${profile.rules}].`);
+const params: DeployParams = { ruleFee: profile.ruleFee, tenderFee: profile.tenderFee, supply: profile.supply, name: profile.name, symbol: profile.symbol, story: profile.story, rules: profile.rules, feeRecipient: approved.feeRecipient };
+if (params.ruleFee.toString() !== approved.ruleFeeWei || params.tenderFee.toString() !== approved.tenderFeeWei || params.supply.toString() !== approved.supply) fail("deploy/profiles.ts no longer matches deploy/approved.json.");
 
 const statePath = here("../deploy/state.xlayer.json");
 const state: State = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, "utf8"), (_, v) => (typeof v === "string" && /^\d+n$/.test(v) ? BigInt(v.slice(0, -1)) : v)) : { ledger: [] };
