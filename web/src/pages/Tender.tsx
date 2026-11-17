@@ -8,8 +8,11 @@ import { useAsync } from '../lib/useAsync.ts';
 import { BidRoom } from './tender/BidRoom.tsx';
 import { Clarifications } from './tender/Clarifications.tsx';
 import { Documents } from './tender/Documents.tsx';
+import { Award } from './tender/Award.tsx';
+import { Opening } from './tender/Opening.tsx';
+import { Panel } from './tender/Panel.tsx';
 
-const TABS = ['Documents', 'Clarifications', 'Bid Room'] as const;
+const TABS = ['Documents', 'Clarifications', 'Bid Room', 'Opening', 'Panel', 'Award and Challenge'] as const;
 type Tab = (typeof TABS)[number];
 
 function when(unixSeconds: bigint | number): string {
@@ -80,6 +83,9 @@ export function Tender() {
       {tab === 'Documents' && <Documents tender={t} />}
       {tab === 'Clarifications' && <Clarifications tender={t} onChanged={detail.reload} />}
       {tab === 'Bid Room' && <BidRoom tender={t} onChanged={detail.reload} />}
+      {tab === 'Opening' && <Opening tender={t} onChanged={detail.reload} />}
+      {tab === 'Panel' && <Panel tender={t} onChanged={detail.reload} />}
+      {tab === 'Award and Challenge' && <Award tender={t} onChanged={detail.reload} />}
     </div>
   );
 }
