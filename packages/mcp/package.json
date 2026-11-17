@@ -1,0 +1,26 @@
+{
+  "name": "@gavelock/mcp",
+  "version": "0.1.0",
+  "description": "Read-only MCP server for Gavelock: list tenders, read a tender, read a rule's truth table, re-derive an award, and read a supplier passport. Reads X Layer directly; sends no transaction.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "gavelock-mcp": "./src/cli.ts"
+  },
+  "scripts": {
+    "start": "node src/cli.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@gavelock/core": "*",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "viem": "^2.57.20",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "~5.9.3",
+    "vitest": "^5.1.0"
+  }
+}
