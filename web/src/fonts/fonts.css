@@ -1,4 +1,4 @@
-/* Latin subsets only, served from this site: no CDN. Both fonts are under the SIL Open Font License (see the
+/* Latin subsets only, served from this site: no CDN. All fonts are under the SIL Open Font License (see the
    licence files beside this one). Characters outside Latin fall back to the system font. */
 @font-face {
   font-family: 'Inter Variable';
@@ -9,9 +9,17 @@
 }
 
 @font-face {
-  font-family: 'JetBrains Mono Variable';
+  font-family: 'Instrument Serif';
   font-style: normal;
   font-display: swap;
-  font-weight: 100 800;
-  src: url('./jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 400;
+  src: url('./instrument-serif-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url('./instrument-serif-latin-400-italic.woff2') format('woff2');
 }
