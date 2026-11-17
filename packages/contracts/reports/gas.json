@@ -53,9 +53,9 @@
     {
       "step": "submit a sealed bid",
       "count": 28,
-      "averageGas": 322749,
-      "maxGas": 334857,
-      "maxOKB": "0.000006697140334857"
+      "averageGas": 322748,
+      "maxGas": 334833,
+      "maxOKB": "0.000006696660334833"
     },
     {
       "step": "open a bid",
@@ -189,6 +189,13 @@
       "averageGas": 22503936,
       "maxGas": 22503936,
       "maxOKB": "0.000450078742503936"
+    },
+    {
+      "step": "last chunk of a 1 MiB document (hashes the whole file)",
+      "count": 1,
+      "averageGas": 13431364,
+      "maxGas": 13431364,
+      "maxOKB": "0.000268627293431364"
     }
   ]
 }
