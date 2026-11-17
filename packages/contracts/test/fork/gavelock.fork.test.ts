@@ -483,7 +483,8 @@ describe("Gavelock on a fork of X Layer", () => {
       const snapshot = await s.test.snapshot();
       await s.mined(await s.gavelock.write.finalize([id, 3n], { account: stranger.account })); // exactly the walk to the median
       let tender = await s.gavelock.read.getTender([id]);
-      assert.equal(tender.stage, 3);
+      // Eight compliant bids: three visits reach the median, and the walk stops there with the floor not yet applied.
+      assert.equal(tender.stage, 2);
       assert.equal(tender.scoreCursor, 0);
       assert.equal(tender.awardedAt, 0n);
       assert.equal(await s.phase(id), "Evaluation");
@@ -568,7 +569,8 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.equal((await s.gavelock.read.getTender([id])).cancelledBy, zeroAddress);
       // Everyone who opened gets their deposit back, including the disqualified bidder; the unopened one forfeits.
       assert.equal(getAddress(await s.gavelock.read.depositRecipient([id, 1n])), getAddress(bidders[1].account.address));
-      assert.equal(getAddress(await s.gavelock.read.depositRecipient([id, 4n])), getAddress(buyer.account.address));
+      // Bid 4 was never opened, but the tender ended because the buyer did not rule, so nothing is forfeited to the buyer.
+      assert.equal(getAddress(await s.gavelock.read.depositRecipient([id, 4n])), getAddress(bidders[4].account.address));
       for (let i = 0; i < plan.length; i++) await s.mined(await s.gavelock.write.claimDeposit([id, BigInt(i)], { account: stranger.account }));
     });
   });

@@ -13,12 +13,12 @@ Updated 16 November 2026. To resume in a new session: read this file and `docs/P
 |---|---|---|
 | 0 | Protocol spike, cost table | Done. Gate A approved 16 November. |
 | 1 | Monorepo scaffold + GitHub Pages deploy | Done 16 November. |
-| 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | Done 16 November. |
-| 3 | Contracts + tests on an X Layer fork | **In progress**: rule stock done and proven; tender contract next |
-| 4 | Web app | Not started |
-| 5 | MCP package | Not started |
-| 6 | Audit pass | Not started |
-| 7 | Mainnet plan, Gate B, deploy, real tenders | Not started |
+| 2 | Core library: bid encoding, banding, rule compiler, time-lock sealing | Done 16 November (78 tests). |
+| 3 | Contracts + tests on an X Layer fork | Done 17 November: rule stock, tender, panel, records, award library, abnormally-low rule. |
+| 4 | Web app | Built: Board, Studio, Rules, Prover, rule builder, tender tabs, Supplier, Buyer, Verify, Docs. Tender pages are first used live after Gate B. |
+| 5 | MCP package | Done 17 November (9 tests, stdio round trip). |
+| 6 | Audit pass | Done 17 November: docs/AUDIT.md. |
+| 7 | Mainnet plan, Gate B, deploy, real tenders | **At Gate B: docs/GATE-B.md. Nothing sent to mainnet.** |
 | 8 | DeWEB dry run, Gate C | Not started |
 | 9 | README + docs/SUBMISSION.md | Not started |
 
@@ -29,7 +29,7 @@ https://ace-coderr.github.io/gavelock/ is deployed by `.github/workflows/deploy.
 ## Gates
 
 - Gate A (cost table): **approved** 16 November 2026. Nothing has been spent.
-- Gate B (mainnet deploy): not reached. BEM is bought by the owner at Gate B, not before. At Gate B: re-read the live fees, say exactly where to swap and how much.
+- Gate B (mainnet deploy): **table ready, waiting for approval**: docs/GATE-B.md (fees re-read 17 November; buy 0.12 BEM; hold about 0.06 OKB in total). BEM is bought by the owner at Gate B, not before. At Gate B: re-read the live fees, say exactly where to swap and how much.
 - Gate C (DeWEB dry run): not reached.
 
 ## Conditions set at Gate A (binding for Task 3)
