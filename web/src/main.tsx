@@ -5,12 +5,15 @@ import '@fontsource-variable/jetbrains-mono/wght.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import { App } from './App.tsx';
+import { WalletProvider } from './lib/wallet.tsx';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root');
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <WalletProvider>
+      <App />
+    </WalletProvider>
   </StrictMode>,
 );
