@@ -1,0 +1,120 @@
+{
+  "gasPriceWei": "20000001",
+  "rows": [
+    {
+      "case": "finalize, 3 bids, rule on, one call",
+      "gas": "364093",
+      "okb": "0.000007281860364093"
+    },
+    {
+      "case": "finalize, 3 bids, rule on, pages of 10 (1 calls, largest call)",
+      "gas": "364081",
+      "okb": "0.000007281620364081"
+    },
+    {
+      "case": "open 3 bids with exact hints, rule on (average per bid)",
+      "gas": "140892",
+      "okb": "0.000002817840140892"
+    },
+    {
+      "case": "finalize, 3 bids, rule off, one call",
+      "gas": "355770",
+      "okb": "0.00000711540035577"
+    },
+    {
+      "case": "finalize, 3 bids, rule off, pages of 10 (1 calls, largest call)",
+      "gas": "355758",
+      "okb": "0.000007115160355758"
+    },
+    {
+      "case": "open 3 bids with exact hints, rule off (average per bid)",
+      "gas": "140892",
+      "okb": "0.000002817840140892"
+    },
+    {
+      "case": "the rule adds, at 3 bids",
+      "gas": "8323",
+      "okb": "0.000000166460008323"
+    },
+    {
+      "case": "finalize, 10 bids, rule on, one call",
+      "gas": "887394",
+      "okb": "0.000017747880887394"
+    },
+    {
+      "case": "finalize, 10 bids, rule on, pages of 10 (2 calls, largest call)",
+      "gas": "494552",
+      "okb": "0.000009891040494552"
+    },
+    {
+      "case": "open 10 bids with exact hints, rule on (average per bid)",
+      "gas": "139736",
+      "okb": "0.000002794720139736"
+    },
+    {
+      "case": "finalize, 10 bids, rule off, one call",
+      "gas": "871127",
+      "okb": "0.000017422540871127"
+    },
+    {
+      "case": "finalize, 10 bids, rule off, pages of 10 (1 calls, largest call)",
+      "gas": "871115",
+      "okb": "0.000017422300871115"
+    },
+    {
+      "case": "open 10 bids with exact hints, rule off (average per bid)",
+      "gas": "139736",
+      "okb": "0.000002794720139736"
+    },
+    {
+      "case": "the rule adds, at 10 bids",
+      "gas": "16267",
+      "okb": "0.000000325340016267"
+    },
+    {
+      "case": "finalize, 50 bids, rule on, one call",
+      "gas": "3865105",
+      "okb": "0.000077302103865105"
+    },
+    {
+      "case": "finalize, 50 bids, rule on, pages of 10 (8 calls, largest call)",
+      "gas": "816184",
+      "okb": "0.000016323680816184"
+    },
+    {
+      "case": "open 50 bids with exact hints, rule on (average per bid)",
+      "gas": "140233",
+      "okb": "0.000002804660140233"
+    },
+    {
+      "case": "finalize, 50 bids, rule off, one call",
+      "gas": "3810099",
+      "okb": "0.000076201983810099"
+    },
+    {
+      "case": "finalize, 50 bids, rule off, pages of 10 (5 calls, largest call)",
+      "gas": "850132",
+      "okb": "0.000017002640850132"
+    },
+    {
+      "case": "open 50 bids with exact hints, rule off (average per bid)",
+      "gas": "140234",
+      "okb": "0.000002804680140234"
+    },
+    {
+      "case": "the rule adds, at 50 bids",
+      "gas": "55006",
+      "okb": "0.000001100120055006"
+    },
+    {
+      "case": "open the 50th (most expensive) bid, exact hint",
+      "gas": "139548",
+      "okb": "0.000002790960139548"
+    },
+    {
+      "case": "open the 50th (most expensive) bid, no hint",
+      "gas": "366612",
+      "okb": "0.000007332240366612"
+    }
+  ]
+}

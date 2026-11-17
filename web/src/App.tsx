@@ -5,6 +5,7 @@ import { Docs } from './pages/Docs.tsx';
 import { RuleProver } from './pages/RuleProver.tsx';
 import { Rules } from './pages/Rules.tsx';
 import { Buyer } from './pages/Buyer.tsx';
+import { Studio } from './pages/Studio.tsx';
 import { Supplier } from './pages/Supplier.tsx';
 import { Tender } from './pages/Tender.tsx';
 import { Verify } from './pages/Verify.tsx';
@@ -18,6 +19,7 @@ export function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Board />} />
+          <Route path="new" element={<Studio />} />
           <Route path="rules" element={<Rules />} />
           <Route path="rules/:id" element={<RuleProver />} />
           <Route path="t/:id" element={<Tender />} />

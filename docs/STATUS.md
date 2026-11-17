@@ -66,7 +66,8 @@ Specified in `packages/core` (`banding.ts`, `award.ts`), implemented in the cont
 - `finalize` stages: 1 walk to the median, 2 skip the flagged prefix, 3 score. Paged, any caller; an upheld challenge unlinks the bid and restarts at stage 0 through the same path.
 - Size: the award logic moved to a linked library `AwardEngine` (7,517 bytes). `Gavelock` is 18,986 bytes (limit 24,576). Deploy order: `AwardEngine`, then `Gavelock` linked to it. Shared structs are in `Types.sol`.
 - Honest limit recorded in `docs/PROTOCOL.md` section 8: several fake low bids can still move the median.
-- Fork results and gas at 3, 10 and 50 bids: see `packages/contracts/reports/` once the fork suite has finished.
+- **Fork results** (`test/fork/abnormal.fork.test.ts`, 9 tests, real circuits): the lowball attack on a quality-weighted rule with a real panel flattens every real price band with the rule off and changes nothing with it on; seven page-size plans and different callers give identical awards equal to the core reference; a recompute after three disqualifications matches too.
+- **Gas** (X Layer, 0.02 gwei; `packages/contracts/reports/gas-abnormal-rule.json`): finalize over 3 / 10 / 50 bids in one call is 364,093 / 887,394 / 3,865,105 gas with the rule on, 355,770 / 871,127 / 3,810,099 off, so the rule adds 8,323 / 16,267 / 55,006 gas. Pages of 10 at 50 bids: 8 calls, largest 816,184 gas. Opening a bid with the exact hint costs about 140,000 gas at any count; the 50th (most expensive) bid with no hint costs 366,612.
 
 ## Decisions made in Task 2 (the contract must match these exactly)
 
