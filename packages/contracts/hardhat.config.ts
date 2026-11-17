@@ -21,7 +21,8 @@ export default defineConfig({
       chainType: "op",
       chainId: 196,
       blockGasLimit: 210_000_000,
-      forking: { url: process.env.XLAYER_RPC_URL ?? "https://rpc.xlayer.tech" },
+      // Pinned to one block so every RPC response is cached after the first run. Bump it deliberately.
+      forking: { url: process.env.XLAYER_RPC_URL ?? "https://rpc.xlayer.tech", blockNumber: 76_155_264 },
     },
   },
 });
