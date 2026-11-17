@@ -1,0 +1,187 @@
+{
+  "gasPriceWei": "20000001",
+  "rows": [
+    {
+      "step": "deploy Gavelock (with its panel and records contracts)",
+      "count": 1,
+      "averageGas": 7136184,
+      "maxGas": 7136184,
+      "maxOKB": "0.000142723687136184"
+    },
+    {
+      "step": "create full tender",
+      "count": 12,
+      "averageGas": 359888,
+      "maxGas": 514609,
+      "maxOKB": "0.000010292180514609"
+    },
+    {
+      "step": "publish a small document",
+      "count": 1,
+      "averageGas": 241007,
+      "maxGas": 241007,
+      "maxOKB": "0.000004820140241007"
+    },
+    {
+      "step": "document chunk (20,000 bytes)",
+      "count": 3,
+      "averageGas": 4509903,
+      "maxGas": 4549999,
+      "maxOKB": "0.000090999984549999"
+    },
+    {
+      "step": "ask a question",
+      "count": 2,
+      "averageGas": 133763,
+      "maxGas": 142843,
+      "maxOKB": "0.000002856860142843"
+    },
+    {
+      "step": "answer a question",
+      "count": 1,
+      "averageGas": 102639,
+      "maxGas": 102639,
+      "maxOKB": "0.000002052780102639"
+    },
+    {
+      "step": "submit a sealed bid",
+      "count": 29,
+      "averageGas": 322723,
+      "maxGas": 334743,
+      "maxOKB": "0.000006694860334743"
+    },
+    {
+      "step": "open a bid",
+      "count": 3,
+      "averageGas": 119696,
+      "maxGas": 159189,
+      "maxOKB": "0.000003183780159189"
+    },
+    {
+      "step": "panel member commits scores",
+      "count": 3,
+      "averageGas": 64216,
+      "maxGas": 64216,
+      "maxOKB": "0.000001284320064216"
+    },
+    {
+      "step": "panel member reveals scores",
+      "count": 2,
+      "averageGas": 81603,
+      "maxGas": 90153,
+      "maxOKB": "0.000001803060090153"
+    },
+    {
+      "step": "finalize: award over 4 bids, one call",
+      "count": 1,
+      "averageGas": 1217055,
+      "maxGas": 1217055,
+      "maxOKB": "0.000024341101217055"
+    },
+    {
+      "step": "file a challenge",
+      "count": 1,
+      "averageGas": 179011,
+      "maxGas": 179011,
+      "maxOKB": "0.000003580220179011"
+    },
+    {
+      "step": "rule on a challenge",
+      "count": 1,
+      "averageGas": 113985,
+      "maxGas": 113985,
+      "maxOKB": "0.000002279700113985"
+    },
+    {
+      "step": "close the tender",
+      "count": 1,
+      "averageGas": 57627,
+      "maxGas": 57627,
+      "maxOKB": "0.000001152540057627"
+    },
+    {
+      "step": "claim a deposit",
+      "count": 4,
+      "averageGas": 51840,
+      "maxGas": 53445,
+      "maxOKB": "0.000001068900053445"
+    },
+    {
+      "step": "withdraw fees",
+      "count": 1,
+      "averageGas": 34770,
+      "maxGas": 34770,
+      "maxOKB": "0.00000069540003477"
+    },
+    {
+      "step": "rule on a challenge (upheld)",
+      "count": 1,
+      "averageGas": 124985,
+      "maxGas": 124985,
+      "maxOKB": "0.000002499700124985"
+    },
+    {
+      "step": "end a stalled tender",
+      "count": 1,
+      "averageGas": 126098,
+      "maxGas": 126098,
+      "maxOKB": "0.000002521960126098"
+    },
+    {
+      "step": "finalize: award over 1 bid",
+      "count": 1,
+      "averageGas": 178358,
+      "maxGas": 178358,
+      "maxOKB": "0.000003567160178358"
+    },
+    {
+      "step": "cancel a tender",
+      "count": 1,
+      "averageGas": 141454,
+      "maxGas": 141454,
+      "maxOKB": "0.000002829080141454"
+    },
+    {
+      "step": "create Quick Quote",
+      "count": 2,
+      "averageGas": 315761,
+      "maxGas": 315761,
+      "maxOKB": "0.000006315220315761"
+    },
+    {
+      "step": "finalize: award over 4 quotes",
+      "count": 1,
+      "averageGas": 362289,
+      "maxGas": 362289,
+      "maxOKB": "0.000007245780362289"
+    },
+    {
+      "step": "document chunk (24,000 bytes)",
+      "count": 4,
+      "averageGas": 5335460,
+      "maxGas": 5428391,
+      "maxOKB": "0.000108567825428391"
+    },
+    {
+      "step": "document chunk (4,000 bytes)",
+      "count": 1,
+      "averageGas": 1162206,
+      "maxGas": 1162206,
+      "maxOKB": "0.000023244121162206"
+    },
+    {
+      "step": "a 100,000-byte document in total",
+      "count": 1,
+      "averageGas": 22504046,
+      "maxGas": 22504046,
+      "maxOKB": "0.000450080942504046"
+    },
+    {
+      "step": "last chunk of a 1 MiB document (hashes the whole file)",
+      "count": 1,
+      "averageGas": 13431386,
+      "maxGas": 13431386,
+      "maxOKB": "0.000268627733431386"
+    }
+  ]
+}

@@ -3,6 +3,8 @@ pragma solidity ^0.8.28;
 
 import {Blob} from "./Blob.sol";
 import {ITapeOutCircuits} from "./interfaces/ITapeOut.sol";
+import {AwardEngine} from "./AwardEngine.sol";
+import {Tender, Bid} from "./Types.sol";
 import {TenderPanel} from "./TenderPanel.sol";
 import {TenderRecords} from "./TenderRecords.sol";
 
@@ -45,17 +47,14 @@ contract Gavelock {
     uint256 public constant MIN_WINDOW = 60;
     uint256 public constant MAX_WINDOW = 365 days;
     uint256 public constant MAX_PANEL = 15;
-    /// A Quick Quote needs at least this many opened quotes to be awarded.
-    uint256 public constant MIN_QUOTES = 3;
     uint256 public constant NOTE_MAX = 280;
     uint256 public constant TEXT_MAX = 2048;
     uint256 public constant CIPHERTEXT_MAX = 2048;
     uint256 public constant TERMS_MAX = 16384;
     uint256 public constant PRICE_STEP_MAX = 1_000_000;
     uint256 public constant DELIVERY_STEP_MAX = 3650;
-    uint256 public constant PANEL_SCORE_MAX = 100;
-    /// Gas given to one rule evaluation. The largest rule the stock accepts needs about 3.5M.
-    uint256 public constant EVAL_GAS = 5_000_000;
+    /// Largest abnormally-low floor: 100% of the median compliant price. 0 switches the rule off.
+    uint256 public constant ABNORMAL_FLOOR_MAX = 10_000;
     uint256 private constant DRAND_GENESIS = 1692803367;
     uint256 private constant DRAND_PERIOD = 3;
 
@@ -88,85 +87,13 @@ contract Gavelock {
         uint32 preferredBMask;
         uint24[7] priceLadderBps;
         uint16[3] deliveryLadderDays;
+        /// A compliant bid priced below this share (in basis points) of the median compliant price is
+        /// abnormally low: flagged, and never the reference for price bands. 0 = off.
+        uint16 abnormalFloorBps;
         address[] panel;
         uint8 quorum;
         /// Title, description, currency and checklist labels as UTF-8 JSON. Shown to people; never read by the contract.
         bytes terms;
-    }
-
-    struct Tender {
-        address buyer;
-        bool quick;
-        bool cancelled;
-        bool closed;
-        /// An upheld challenge removed a bid and the award is being computed again.
-        bool recomputing;
-        uint8 panelSize;
-        uint8 quorum;
-        uint8 checklistItems;
-        uint32 ruleId;
-        uint64 createdAt;
-        uint64 clarificationsStart;
-        uint64 biddingStart;
-        uint64 deadline;
-        uint64 openingEnd;
-        uint64 commitEnd;
-        uint64 revealEnd;
-        uint32 standstill;
-        /// drand quicknet round every bid must be sealed to: the first round at or after the deadline.
-        uint64 drandRound;
-        uint96 bidDeposit;
-        uint32 mandatoryMask;
-        uint32 preferredAMask;
-        uint32 preferredBMask;
-        uint24[7] priceLadderBps;
-        uint16[3] deliveryLadderDays;
-        address terms;
-        uint64 createdBlock;
-        uint32 openedCount;
-        uint32 openChallenges;
-        /// Number of times the award has been reset by an upheld challenge.
-        uint32 generation;
-        // ---- award computation (see finalize)
-        uint128 lowestValidPrice;
-        uint32 priceCursor;
-        uint32 scoreCursor;
-        /// Winning bid index + 1, or 0.
-        uint32 best;
-        uint8 bestScore;
-        uint64 awardedAt;
-        uint64 awardedBlock;
-        /// End of the latest standstill window. Kept across a recompute.
-        uint64 standstillEnd;
-        // ---- end
-        uint64 endedAt;
-        uint64 endedBlock;
-        /// Zero when the contract itself cancelled the tender (no bids, no quorum, ...).
-        address cancelledBy;
-        address cancelReason;
-    }
-
-    struct Bid {
-        address bidder;
-        uint64 sealedBlock;
-        bool opened;
-        bool disqualified;
-        bool claimed;
-        bool eligible;
-        bytes32 commitment;
-        address ciphertext;
-        uint64 openedBlock;
-        uint32 deliveryDays;
-        uint128 price;
-        uint32 compliance;
-        uint8 score;
-        /// The 11 bits given to the rule circuit.
-        uint16 ruleInput;
-        uint8 panelMedian;
-        /// generation + 1 of the award computation that produced score and eligible; 0 = never scored.
-        uint32 scoredIn;
-        address note;
-        bytes32 salt;
     }
 
     struct Challenge {
@@ -193,7 +120,7 @@ contract Gavelock {
     event TenderCreated(uint256 indexed tenderId, address indexed buyer, bool quick, uint32 ruleId);
     event BidSealed(uint256 indexed tenderId, uint256 indexed index, address indexed bidder, bytes32 commitment);
     event BidOpened(uint256 indexed tenderId, uint256 indexed index, uint256 price, uint32 deliveryDays, uint32 compliance);
-    event AwardProgress(uint256 indexed tenderId, uint32 priceCursor, uint32 scoreCursor);
+    event AwardProgress(uint256 indexed tenderId, uint8 stage, uint32 scoreCursor);
     event Awarded(uint256 indexed tenderId, uint256 indexed winner, uint8 score, uint32 generation);
     event Challenged(uint256 indexed tenderId, uint256 indexed index, uint256 indexed bidIndex, uint8 kind, address challenger);
     event Ruled(uint256 indexed tenderId, uint256 indexed index, bool upheld);
@@ -218,6 +145,7 @@ contract Gavelock {
     error AlreadyDone();
     error CommitmentMismatch();
     error BadBid();
+    error BadHint();
     error NotEnoughGas();
     error ChallengesOpen();
     error NothingToDo();
@@ -270,6 +198,7 @@ contract Gavelock {
         if (!ruleStock.isRule(p.ruleId)) revert BadRule();
         _checkChecklist(p.checklistItems, p.mandatoryMask, p.preferredAMask, p.preferredBMask);
         _checkLadders(p.priceLadderBps, p.deliveryLadderDays);
+        if (p.abnormalFloorBps > ABNORMAL_FLOOR_MAX) revert BadLadder();
         if (p.terms.length == 0 || p.terms.length > TERMS_MAX) revert BadLength();
 
         id = _tenders.length;
@@ -296,6 +225,7 @@ contract Gavelock {
         t.preferredBMask = p.preferredBMask;
         t.priceLadderBps = p.priceLadderBps;
         t.deliveryLadderDays = p.deliveryLadderDays;
+        t.abnormalFloorBps = p.abnormalFloorBps;
         t.terms = Blob.put(p.terms);
         t.createdBlock = uint64(block.number);
 
@@ -359,7 +289,12 @@ contract Gavelock {
 
     /// @notice Open a bid after the deadline. Anyone may call: the plaintext is recovered by decrypting the
     /// on-chain ciphertext once the drand round is published. The contract checks it against the commitment.
-    function openBid(uint256 id, uint256 index, uint256 price, uint32 deliveryDays, uint32 compliance, string calldata note, bytes32 salt) external {
+    /// @param hint Where a compliant bid goes in the price-ordered list: the index + 1 of any listed bid
+    /// that sorts before it (lower price, or same price and earlier), or 0 to search from the cheapest.
+    /// A hint only saves gas. One that does not sort before the bid reverts; none can change the order.
+    function openBid(uint256 id, uint256 index, uint256 price, uint32 deliveryDays, uint32 compliance, string calldata note, bytes32 salt, uint256 hint)
+        external
+    {
         Tender storage t = _tender(id);
         if (t.cancelled || block.timestamp < t.deadline || block.timestamp >= t.openingEnd) revert WrongPhase();
         if (index >= _bids[id].length) revert NoSuchRecord();
@@ -369,6 +304,7 @@ contract Gavelock {
         if (keccak256(abi.encode(block.chainid, address(this), id, b.bidder, price, deliveryDays, compliance, note, salt)) != b.commitment) {
             revert CommitmentMismatch();
         }
+        if (compliance & t.mandatoryMask == t.mandatoryMask) AwardEngine.link(t, _bids[id], index, uint128(price), hint);
         b.opened = true;
         b.openedBlock = uint64(block.number);
         b.price = uint128(price);
@@ -382,128 +318,13 @@ contract Gavelock {
 
     // ================================================================== award
 
-    /// @notice Compute the award. Anyone may call, as often as needed: each call processes at most
-    /// `maxBids` bid visits and the result is the same however the work is split.
-    ///
-    /// Pass 1 finds the lowest valid price (opened, not disqualified, every mandatory item claimed).
-    /// Pass 2 bands each bid, asks the rule circuit for its score and keeps the best: higher score,
-    /// then lower price, then earlier bid.
+    /// @notice Compute the award. Anyone may call, as often as needed: each call makes at most `maxBids`
+    /// bid visits, and the result is the same however the work is split and whoever does it.
+    /// The computation itself lives in the AwardEngine library.
     function finalize(uint256 id, uint256 maxBids) external {
-        Tender storage t = _tender(id);
-        if (t.cancelled || t.closed || t.awardedAt != 0) revert WrongPhase();
-        if (!t.recomputing && block.timestamp < t.revealEnd) revert WrongPhase();
-        if (maxBids == 0) revert NothingToDo();
-
-        if (!t.recomputing && t.priceCursor == 0 && t.scoreCursor == 0) {
-            if (t.openedCount == 0) return _end(id, t, "No bid was opened.");
-            if (t.quick && t.openedCount < MIN_QUOTES) return _end(id, t, "Fewer than three quotes were opened.");
-            if (t.panelSize != 0 && panel.revealedCount(id) < t.quorum) return _end(id, t, "The evaluation panel did not reach its quorum.");
-        }
-
-        Bid[] storage bids = _bids[id];
-        uint256 total = bids.length;
-        uint256 budget = maxBids;
-
-        uint256 cursor = t.priceCursor;
-        if (cursor < total) {
-            uint128 lowest = t.lowestValidPrice;
-            uint32 mandatory = t.mandatoryMask;
-            while (cursor < total && budget != 0) {
-                Bid storage b = bids[cursor];
-                if (b.opened && !b.disqualified && b.compliance & mandatory == mandatory && (lowest == 0 || b.price < lowest)) lowest = b.price;
-                cursor++;
-                budget--;
-            }
-            t.lowestValidPrice = lowest;
-            t.priceCursor = uint32(cursor);
-        }
-
-        if (cursor == total) {
-            cursor = t.scoreCursor;
-            uint32 scoredIn = t.generation + 1;
-            while (cursor < total && budget != 0) {
-                Bid storage b = bids[cursor];
-                if (b.opened && !b.disqualified) {
-                    (bool ok, bool eligible, uint8 score) = _score(id, t, b, cursor);
-                    if (!ok) return _end(id, t, "The rule circuit did not return a valid result.");
-                    b.eligible = eligible;
-                    b.score = score;
-                    b.scoredIn = scoredIn;
-                    if (eligible) {
-                        uint256 best = t.best;
-                        // Bids are visited in order, so an equal score and price never displaces an earlier bid.
-                        if (best == 0 || score > t.bestScore || (score == t.bestScore && b.price < bids[best - 1].price)) {
-                            t.best = uint32(cursor + 1);
-                            t.bestScore = score;
-                        }
-                    }
-                }
-                cursor++;
-                budget--;
-            }
-            t.scoreCursor = uint32(cursor);
-            if (cursor == total) {
-                if (t.best == 0) return _end(id, t, "No bid was eligible.");
-                t.recomputing = false;
-                t.awardedAt = uint64(block.timestamp);
-                t.awardedBlock = uint64(block.number);
-                t.standstillEnd = uint64(block.timestamp) + t.standstill;
-                emit Awarded(id, t.best - 1, t.bestScore, t.generation);
-                return;
-            }
-        }
-        emit AwardProgress(id, t.priceCursor, t.scoreCursor);
+        AwardEngine.finalize(_tender(id), _bids[id], id, maxBids, circuits, panel);
     }
 
-    /// Band one bid and ask the rule circuit for its outcome.
-    function _score(uint256 id, Tender storage t, Bid storage b, uint256 index) private returns (bool ok, bool eligible, uint8 score) {
-        uint256 input = _priceBand(b.price, t.lowestValidPrice, t.priceLadderBps);
-        uint256 delivery = 0;
-        for (uint256 i = 0; i < 3; i++) {
-            if (b.deliveryDays > t.deliveryLadderDays[i]) delivery++;
-        }
-        input |= delivery << 3;
-        uint32 c = b.compliance;
-        if (c & t.mandatoryMask == t.mandatoryMask) input |= 1 << 5;
-        if (t.preferredAMask != 0 && c & t.preferredAMask == t.preferredAMask) input |= 1 << 6;
-        if (t.preferredBMask != 0 && c & t.preferredBMask == t.preferredBMask) input |= 1 << 7;
-        if (t.panelSize != 0) {
-            uint256 median = panel.medianOf(id, index);
-            b.panelMedian = uint8(median);
-            input |= ((median * 8) / (PANEL_SCORE_MAX + 1)) << 8;
-        }
-        b.ruleInput = uint16(input);
-
-        // The call gets a fixed amount of gas. Refuse to start without it, so a caller cannot make a
-        // healthy circuit look broken by sending too little.
-        if (gasleft() < EVAL_GAS + EVAL_GAS / 32 + 60_000) revert NotEnoughGas();
-        bytes memory packed = new bytes(2);
-        packed[0] = bytes1(uint8(input));
-        packed[1] = bytes1(uint8(input >> 8));
-        (bool success, bytes memory ret) = address(circuits).staticcall{gas: EVAL_GAS}(abi.encodeCall(ITapeOutCircuits.eval, (t.ruleId, packed)));
-        // A rule returns exactly one byte holding five bits: ABI-encoded as offset 32, length 1, data.
-        if (!success || ret.length != 96) return (false, false, 0);
-        uint256 offset;
-        uint256 length;
-        uint256 word;
-        assembly {
-            offset := mload(add(ret, 32))
-            length := mload(add(ret, 64))
-            word := byte(0, mload(add(ret, 96)))
-        }
-        if (offset != 32 || length != 1 || word > 31) return (false, false, 0);
-        eligible = word & 1 == 1;
-        score = eligible ? uint8(word >> 1) : 0;
-        ok = true;
-    }
-
-    function _priceBand(uint128 price, uint128 lowest, uint24[7] storage ladder) private view returns (uint256 band) {
-        if (lowest == 0) return 7;
-        uint256 scaled = uint256(price) * 10_000;
-        for (uint256 i = 0; i < 7; i++) {
-            if (scaled > uint256(lowest) * (10_000 + ladder[i])) band++;
-        }
-    }
 
     // ================================================================== standstill
 
@@ -533,19 +354,7 @@ contract Gavelock {
         c.rulingReason = _text(reason);
         t.openChallenges--;
         if (upheld) {
-            Bid storage b = _bids[id][c.bidIndex];
-            if (!b.disqualified) {
-                b.disqualified = true;
-                t.recomputing = true;
-                t.generation++;
-                t.lowestValidPrice = 0;
-                t.priceCursor = 0;
-                t.scoreCursor = 0;
-                t.best = 0;
-                t.bestScore = 0;
-                t.awardedAt = 0;
-                t.awardedBlock = 0;
-            }
+            AwardEngine.disqualify(t, _bids[id], c.bidIndex);
         }
         emit Ruled(id, index, upheld);
     }

@@ -79,6 +79,7 @@ describe("Gavelock on a fork of X Layer", () => {
       preferredBMask: 24,
       priceLadderBps: [0, 250, 500, 1000, 1500, 2500, 4000],
       deliveryLadderDays: [7, 14, 30],
+      abnormalFloorBps: 7000,
       panel: [] as string[],
       quorum: 0,
       terms: "0x7b7d" as Hex,
@@ -106,6 +107,9 @@ describe("Gavelock on a fork of X Layer", () => {
     assert.match(await attempt({ checklistItems: 33 }), /BadChecklist/);
     assert.match(await attempt({ priceLadderBps: [0, 250, 250, 1000, 1500, 2500, 4000] }), /BadLadder/);
     assert.match(await attempt({ deliveryLadderDays: [7, 14, 4000] }), /BadLadder/);
+    assert.match(await attempt({ abnormalFloorBps: 10_001 }), /BadLadder/);
+    assert.equal(await attempt({ abnormalFloorBps: 0 }), "");
+    assert.equal(await attempt({ abnormalFloorBps: 10_000 }), "");
     assert.match(await attempt({ terms: "0x" }), /BadLength/);
   });
 
@@ -134,7 +138,7 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.deepEqual(t.deliveryLadderDays, [7, 14, 30]);
       assert.equal((await s.gavelock.read.feesAccrued()) - feesBefore, TENDER_FEE);
       assert.equal(JSON.parse(await text(s, s.gavelock, t.terms)).title, "Fork test tender");
-      assert.deepEqual((await s.panel.read.panelOf([id])).map(getAddress), [p1, p2, p3].map((w) => getAddress(w.account.address)));
+      assert.deepEqual((await s.panel.read.panelOf([id])).map((a: string) => getAddress(a)), [p1, p2, p3].map((w) => getAddress(w.account.address)));
       assert.equal(await s.gavelock.read.tendersOf([buyer.account.address]), 1n);
       assert.equal(await s.gavelock.read.tenderOfBuyer([buyer.account.address, 0n]), id);
       assert.equal(await s.phase(id), "Clarifications");
@@ -227,7 +231,7 @@ describe("Gavelock on a fork of X Layer", () => {
       assert.match(await submit(bidders[4].account, DEPOSIT, "0x"), /BadLength/);
       assert.match(await submit(bidders[4].account, DEPOSIT, `0x${"00".repeat(2049)}`), /BadLength/);
       // Nobody can open during bidding, not even with the right values.
-      assert.match(await revertOf(s.gavelock.simulate.openBid([id, 0n, 100_000n, 10, 0b00111, "Warranty 24 months.", sealed[0].bid.salt], { account: bidders[0].account })), /WrongPhase/);
+      assert.match(await revertOf(s.gavelock.simulate.openBid([id, 0n, 100_000n, 10, 0b00111, "Warranty 24 months.", sealed[0].bid.salt, 0n], { account: bidders[0].account })), /WrongPhase/);
     });
 
     it("refuses a bid at the deadline", async () => {
@@ -240,7 +244,7 @@ describe("Gavelock on a fork of X Layer", () => {
       const a = sealed[0];
       const open = (over: Partial<{ price: bigint; days: number; compliance: number; note: string; salt: Hex; index: bigint }>) =>
         revertOf(
-          s.gavelock.simulate.openBid([id, over.index ?? a.index, over.price ?? a.bid.price, over.days ?? a.bid.deliveryDays, over.compliance ?? a.bid.compliance, over.note ?? a.bid.note, over.salt ?? a.bid.salt], {
+          s.gavelock.simulate.openBid([id, over.index ?? a.index, over.price ?? a.bid.price, over.days ?? a.bid.deliveryDays, over.compliance ?? a.bid.compliance, over.note ?? a.bid.note, over.salt ?? a.bid.salt, 0n], {
             account: stranger.account,
           }),
         );
@@ -405,9 +409,9 @@ describe("Gavelock on a fork of X Layer", () => {
       const bids = [];
       for (let i = 0; i < plan.length; i++) {
         const b = await s.gavelock.read.getBid([id, BigInt(i)]);
-        bids.push({ score: b.score, eligible: b.eligible, ruleInput: b.ruleInput, panelMedian: b.panelMedian, scoredIn: b.scoredIn, disqualified: b.disqualified });
+        bids.push({ score: b.score, eligible: b.eligible, ruleInput: b.ruleInput, panelMedian: b.panelMedian, scoredIn: b.scoredIn, disqualified: b.disqualified, abnormallyLow: b.abnormallyLow });
       }
-      return { winner: tender.best - 1, bestScore: tender.bestScore, lowest: tender.lowestValidPrice.toString(), generation: tender.generation, bids };
+      return { winner: tender.best - 1, bestScore: tender.bestScore, lowest: tender.lowestValidPrice.toString(), median: tender.medianPrice.toString(), generation: tender.generation, bids };
     };
 
     /** Run finalize with the given page sizes (the last one repeats), rotating through callers. */
@@ -473,15 +477,15 @@ describe("Gavelock on a fork of X Layer", () => {
 
     it("has no award until both passes are complete", async () => {
       const snapshot = await s.test.snapshot();
-      await s.mined(await s.gavelock.write.finalize([id, 10n], { account: stranger.account })); // exactly the price pass
+      await s.mined(await s.gavelock.write.finalize([id, 3n], { account: stranger.account })); // exactly the walk to the median
       let tender = await s.gavelock.read.getTender([id]);
-      assert.equal(tender.priceCursor, 10);
+      assert.equal(tender.stage, 3);
       assert.equal(tender.scoreCursor, 0);
       assert.equal(tender.awardedAt, 0n);
       assert.equal(await s.phase(id), "Evaluation");
       assert.match(await revertOf(s.gavelock.simulate.challenge([id, 1n, 0, "x"], { account: stranger.account })), /WrongPhase/);
       assert.match(await revertOf(s.gavelock.simulate.close([id], { account: stranger.account })), /WrongPhase/);
-      await s.mined(await s.gavelock.write.finalize([id, 9n], { account: buyer.account })); // one bid short
+      await s.mined(await s.gavelock.write.finalize([id, 9n], { account: buyer.account })); // one bid short of all ten
       tender = await s.gavelock.read.getTender([id]);
       assert.equal(tender.scoreCursor, 9);
       assert.equal(tender.awardedAt, 0n);

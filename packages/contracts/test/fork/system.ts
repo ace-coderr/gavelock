@@ -1,6 +1,7 @@
 // Deploys the whole Gavelock system on the fork and provides the helpers the lifecycle tests share.
 import { bytesToHex, encodeAbiParameters, getAddress, keccak256, parseEther, type Address, type Hex } from "viem";
 import {
+  ABNORMAL_FLOOR_DEFAULT_BPS,
   DEFAULT_LADDERS,
   STARTER_RULES,
   TAPEOUT,
@@ -63,7 +64,12 @@ export async function deploySystem() {
     rules[rule.key] = { id: Number(result), table, gates: compiled.gates };
   }
 
-  const { contract: gavelock, deploymentTransaction } = (await viem.sendDeploymentTransaction("Gavelock", [stock.address, feeRecipient.account.address, TENDER_FEE])) as any;
+  const engineDeployment = (await viem.sendDeploymentTransaction("AwardEngine")) as any;
+  const engineReceipt = await mined(engineDeployment.deploymentTransaction.hash);
+  const engine = engineDeployment.contract;
+  const { contract: gavelock, deploymentTransaction } = (await viem.sendDeploymentTransaction("Gavelock", [stock.address, feeRecipient.account.address, TENDER_FEE], {
+    libraries: { "project/contracts/AwardEngine.sol:AwardEngine": engine.address },
+  } as never)) as any;
   const deployReceipt = await mined(deploymentTransaction.hash);
   const panel = (await viem.getContractAt("TenderPanel", await gavelock.read.panel())) as any;
   const records = (await viem.getContractAt("TenderRecords", await gavelock.read.records())) as any;
@@ -84,6 +90,7 @@ export async function deploySystem() {
     gas.push({ step, gas: receipt.gasUsed });
     return receipt;
   };
+  gas.push({ step: "deploy the AwardEngine library", gas: engineReceipt.gasUsed });
   gas.push({ step: "deploy Gavelock (with its panel and records contracts)", gas: deployReceipt.gasUsed });
 
   // ---------------------------------------------------------------- tenders
@@ -94,6 +101,8 @@ export async function deploySystem() {
     quorum?: number;
     deposit?: bigint;
     checklist?: Checklist;
+    /** Abnormally-low floor in basis points; the default is the protocol default. */
+    abnormalFloorBps?: number;
     buyer: any;
   }
   /** Create a tender whose phases are each an hour long, starting an hour from now. */
@@ -119,6 +128,7 @@ export async function deploySystem() {
       preferredBMask: checklist.preferredBMask,
       priceLadderBps: [...DEFAULT_LADDERS.priceBps],
       deliveryLadderDays: [...DEFAULT_LADDERS.deliveryDays],
+      abnormalFloorBps: o.abnormalFloorBps ?? ABNORMAL_FLOOR_DEFAULT_BPS,
       panel: panelMembers,
       quorum: o.quorum ?? (panelMembers.length ? Math.ceil(panelMembers.length / 2) : 0),
       terms: bytesToHex(new TextEncoder().encode(JSON.stringify({ title: "Fork test tender", currency: "USD", decimals: 2, checklist: ["Registered", "Tax clearance", "ISO 9001", "Local office", "Two references"] }))),
@@ -142,8 +152,9 @@ export async function deploySystem() {
     return { index, bidder, bid, commitment, ciphertext };
   }
 
-  const openBid = (id: bigint, s: Sealed, opener: any) =>
-    gavelock.write.openBid([id, s.index, s.bid.price, s.bid.deliveryDays, s.bid.compliance, s.bid.note, s.bid.salt], { account: opener.account });
+  /** Open a bid. The hint defaults to 0: the contract finds the place in the price order itself. */
+  const openBid = (id: bigint, s: Sealed, opener: any, hint = 0n) =>
+    gavelock.write.openBid([id, s.index, s.bid.price, s.bid.deliveryDays, s.bid.compliance, s.bid.note, s.bid.salt, hint], { account: opener.account });
 
   const scoreCommitment = (id: bigint, member: Address, scores: number[], salt: Hex) =>
     keccak256(
@@ -182,7 +193,7 @@ export async function deploySystem() {
         panelMedian: revealed.length ? medianScore(revealed.map((scores) => scores[i]!)) : null,
       });
     }
-    return { award: computeAward(opened, DEFAULT_LADDERS, checklist, table), chain, t };
+    return { award: computeAward(opened, DEFAULT_LADDERS, checklist, table, t.abnormalFloorBps), chain, t, opened };
   }
 
   const phase = async (id: bigint) => PHASES[Number(await gavelock.read.phaseOf([id]))]!;
@@ -191,7 +202,7 @@ export async function deploySystem() {
     return Buffer.from(((await gavelock.read.read([t.cancelReason])) as Hex).slice(2), "hex").toString("utf8");
   };
 
-  return { ...fork, stock, gavelock, panel, records, rules, deployer, feeRecipient, chainNow, warpTo, gas, track, createTender, submitBid, openBid, scoreCommitment, referenceAward, phase, cancelReason, getAddress };
+  return { ...fork, stock, engine, gavelock, panel, records, rules, deployer, feeRecipient, chainNow, warpTo, gas, track, createTender, submitBid, openBid, scoreCommitment, referenceAward, phase, cancelReason, getAddress };
 }
 
 export type System = Awaited<ReturnType<typeof deploySystem>>;

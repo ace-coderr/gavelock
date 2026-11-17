@@ -25,7 +25,10 @@ describe("a misbehaving rule circuit", () => {
     [, feeRecipient, buyer, bidder, stranger] = await viem.getWalletClients();
     chainId = await pub.getChainId();
     mock = await viem.deployContract("MockRuleSource");
-    gavelock = await viem.deployContract("Gavelock", [mock.address, feeRecipient.account.address, 0n]);
+    const engine = await viem.deployContract("AwardEngine");
+    gavelock = await viem.deployContract("Gavelock", [mock.address, feeRecipient.account.address, 0n], {
+      libraries: { "project/contracts/AwardEngine.sol:AwardEngine": engine.address },
+    } as never);
   });
 
   const mined = async (hash: Hex) => {
@@ -58,6 +61,7 @@ describe("a misbehaving rule circuit", () => {
       preferredBMask: 0,
       priceLadderBps: [0, 250, 500, 1000, 1500, 2500, 4000],
       deliveryLadderDays: [7, 14, 30],
+      abnormalFloorBps: 7000,
       panel: [],
       quorum: 0,
       terms: "0x7b7d",
@@ -69,7 +73,7 @@ describe("a misbehaving rule circuit", () => {
     await warpTo(params.biddingStart);
     await mined(await gavelock.write.submitBid([id, commitment, "0x01"], { account: bidder.account, value: DEPOSIT }));
     await warpTo(params.deadline);
-    await mined(await gavelock.write.openBid([id, 0n, bid.price, bid.deliveryDays, bid.compliance, bid.note, bid.salt], { account: stranger.account }));
+    await mined(await gavelock.write.openBid([id, 0n, bid.price, bid.deliveryDays, bid.compliance, bid.note, bid.salt, 0n], { account: stranger.account }));
     await warpTo(params.deadline + BigInt(HOUR));
     return id as bigint;
   }

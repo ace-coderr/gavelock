@@ -50,6 +50,48 @@ export function validateLadders(l: Ladders): string[] {
   return problems;
 }
 
+// ---- abnormally low bids
+//
+// Price bands are measured against a reference price. If that were simply the lowest compliant price,
+// one fake bid at an absurd price would push every real bid into the last band and price would stop
+// mattering. So a compliant bid priced below a fraction of the median compliant price is "abnormally
+// low": it keeps its place in the tender (eligible, price band 0, publicly flagged) but it cannot be
+// the reference price for anyone else.
+
+/** Default floor: a compliant bid below 70% of the median compliant price is abnormally low. */
+export const ABNORMAL_FLOOR_DEFAULT_BPS = 7000;
+/** Largest floor: 100% of the median. 0 switches the rule off. */
+export const ABNORMAL_FLOOR_MAX_BPS = 10_000;
+/** The rule needs at least this many compliant bids; with fewer, a median says nothing. */
+export const ABNORMAL_MIN_BIDS = 3;
+
+export function validateAbnormalFloor(floorBps: number): string[] {
+  return Number.isInteger(floorBps) && floorBps >= 0 && floorBps <= ABNORMAL_FLOOR_MAX_BPS
+    ? []
+    : ['The abnormally-low floor must be a whole number of basis points from 0 to 10,000.'];
+}
+
+/**
+ * Median of the compliant prices. With an even count it is the mean of the two middle prices,
+ * rounded down (the same convention as the panel median).
+ */
+export function medianPrice(prices: readonly bigint[]): bigint {
+  if (prices.length === 0) throw new RangeError('no prices');
+  const sorted = [...prices].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const mid = sorted.length >> 1;
+  return sorted.length % 2 === 1 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2n;
+}
+
+/** Does the abnormally-low rule apply to a tender with this many compliant bids? */
+export function abnormalRuleApplies(compliantBids: number, floorBps: number): boolean {
+  return floorBps !== 0 && compliantBids >= ABNORMAL_MIN_BIDS;
+}
+
+/** Exact integer test: price < median * floor, as price * 10000 < median * floorBps. */
+export function isAbnormallyLow(price: bigint, median: bigint, floorBps: number): boolean {
+  return price * 10_000n < median * BigInt(floorBps);
+}
+
 /** Problems with a tender's checklist, in plain words. */
 export function validateChecklist(c: Checklist): string[] {
   const problems: string[] = [];
@@ -121,10 +163,13 @@ export interface BandInput {
   panelMedian: number | null;
 }
 
-/** The six facts a rule circuit sees for one bid. */
-export function bandBid(bid: BandInput, lowestValidPrice: bigint, ladders: Ladders, checklist: Checklist): Banded {
+/**
+ * The six facts a rule circuit sees for one bid.
+ * An abnormally low bid is given price band 0: it is not penalised, it just is not the reference.
+ */
+export function bandBid(bid: BandInput, lowestValidPrice: bigint, ladders: Ladders, checklist: Checklist, abnormallyLow = false): Banded {
   return {
-    price: priceBand(bid.price, lowestValidPrice, ladders.priceBps),
+    price: abnormallyLow ? 0 : priceBand(bid.price, lowestValidPrice, ladders.priceBps),
     delivery: deliveryBand(bid.deliveryDays, ladders.deliveryDays),
     mandatory: meetsMandatory(bid.compliance, checklist),
     preferredA: checklist.preferredAMask !== 0 && claimsAll(bid.compliance, checklist.preferredAMask),

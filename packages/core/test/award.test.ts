@@ -5,7 +5,7 @@ import {
   bandBid,
   computeAward,
   deliveryBand,
-  lowestValidPrice,
+  priceReference,
   medianScore,
   meetsMandatory,
   panelBand,
@@ -119,7 +119,7 @@ describe('banding', () => {
 
 describe('award', () => {
   it('awards the lowest compliant price', () => {
-    const award = computeAward([bid(0, 1200n), bid(1, 1000n), bid(2, 1100n)], DEFAULT_LADDERS, checklist, lowestPrice);
+    const award = computeAward([bid(0, 1200n), bid(1, 1000n), bid(2, 1100n)], DEFAULT_LADDERS, checklist, lowestPrice, 0);
     expect(award.lowestValidPrice).toBe(1000n);
     expect(award.ranking).toEqual([1, 2, 0]);
     expect(award.winner).toBe(1);
@@ -127,8 +127,8 @@ describe('award', () => {
 
   it('ignores a non-compliant low price when banding everyone else', () => {
     const bids = [bid(0, 1n, { compliance: 0b00001 }), bid(1, 1000n), bid(2, 1300n)];
-    const award = computeAward(bids, DEFAULT_LADDERS, checklist, lowestPrice);
-    expect(lowestValidPrice(bids, checklist)).toBe(1000n);
+    const award = computeAward(bids, DEFAULT_LADDERS, checklist, lowestPrice, 0);
+    expect(priceReference(bids, checklist, 0).lowestValidPrice).toBe(1000n);
     expect(award.winner).toBe(1);
     expect(award.ranking).toEqual([1, 2]);
     expect(award.scored.find((s) => s.index === 0)!.outcome).toEqual({ eligible: false, score: 0 });
@@ -137,33 +137,33 @@ describe('award', () => {
 
   it('breaks a score tie by lower price, then by earlier bid', () => {
     // 1000 and 1020 share price band 1 relative to 990... make all three share a band: within 2.5% of the lowest.
-    const sameBand = computeAward([bid(0, 1010n), bid(1, 1005n), bid(2, 1000n, { compliance: 0 })], DEFAULT_LADDERS, checklist, lowestPrice);
+    const sameBand = computeAward([bid(0, 1010n), bid(1, 1005n), bid(2, 1000n, { compliance: 0 })], DEFAULT_LADDERS, checklist, lowestPrice, 0);
     expect(sameBand.lowestValidPrice).toBe(1005n);
     expect(sameBand.scored.map((s) => s.outcome.score)).toEqual([13, 15, 0]);
-    const tie = computeAward([bid(0, 1010n), bid(1, 1005n), bid(2, 1001n)], DEFAULT_LADDERS, checklist, lowestPrice);
+    const tie = computeAward([bid(0, 1010n), bid(1, 1005n), bid(2, 1001n)], DEFAULT_LADDERS, checklist, lowestPrice, 0);
     expect(tie.scored.map((s) => s.outcome.score)).toEqual([13, 13, 15]);
     expect(tie.ranking).toEqual([2, 1, 0]); // 1005 beats 1010 at the same score
-    const identical = computeAward([bid(4, 1000n), bid(2, 1000n), bid(9, 1000n)], DEFAULT_LADDERS, checklist, lowestPrice);
+    const identical = computeAward([bid(4, 1000n), bid(2, 1000n), bid(9, 1000n)], DEFAULT_LADDERS, checklist, lowestPrice, 0);
     expect(identical.ranking).toEqual([2, 4, 9]); // same score and price: the earlier bid wins
   });
 
   it('weighs quality against price', () => {
     const bids = [bid(0, 1000n, { panelMedian: 30 }), bid(1, 1300n, { panelMedian: 95 })];
-    expect(computeAward(bids, DEFAULT_LADDERS, checklist, lowestPrice).winner).toBe(0);
-    expect(computeAward(bids, DEFAULT_LADDERS, checklist, price60).winner).toBe(0);
-    expect(computeAward(bids, DEFAULT_LADDERS, checklist, quality70).winner).toBe(1);
+    expect(computeAward(bids, DEFAULT_LADDERS, checklist, lowestPrice, 0).winner).toBe(0);
+    expect(computeAward(bids, DEFAULT_LADDERS, checklist, price60, 0).winner).toBe(0);
+    expect(computeAward(bids, DEFAULT_LADDERS, checklist, quality70, 0).winner).toBe(1);
   });
 
   it('awards the fastest delivery in Quick Quote, price breaking ties', () => {
     const quotes = [bid(0, 900n, { deliveryDays: 20, panelMedian: null }), bid(1, 1500n, { deliveryDays: 5, panelMedian: null }), bid(2, 1400n, { deliveryDays: 6, panelMedian: null })];
-    const award = computeAward(quotes, DEFAULT_LADDERS, checklist, fastest);
+    const award = computeAward(quotes, DEFAULT_LADDERS, checklist, fastest, 0);
     expect(award.ranking).toEqual([2, 1, 0]);
   });
 
   it('recomputes without a disqualified bid', () => {
     const bids = [bid(0, 1000n), bid(1, 1200n), bid(2, 1210n)];
-    expect(computeAward(bids, DEFAULT_LADDERS, checklist, lowestPrice).winner).toBe(0);
-    const after = computeAward([{ ...bids[0]!, disqualified: true }, bids[1]!, bids[2]!], DEFAULT_LADDERS, checklist, lowestPrice);
+    expect(computeAward(bids, DEFAULT_LADDERS, checklist, lowestPrice, 0).winner).toBe(0);
+    const after = computeAward([{ ...bids[0]!, disqualified: true }, bids[1]!, bids[2]!], DEFAULT_LADDERS, checklist, lowestPrice, 0);
     expect(after.lowestValidPrice).toBe(1200n);
     expect(after.winner).toBe(1);
     expect(after.scored.map((s) => s.index)).toEqual([1, 2]);
@@ -171,18 +171,18 @@ describe('award', () => {
   });
 
   it('handles zero bids, one bid and no eligible bid', () => {
-    expect(computeAward([], DEFAULT_LADDERS, checklist, lowestPrice)).toEqual({ lowestValidPrice: null, scored: [], ranking: [], winner: null });
-    expect(computeAward([bid(3, 500n)], DEFAULT_LADDERS, checklist, lowestPrice).winner).toBe(3);
-    const none = computeAward([bid(0, 500n, { compliance: 0 }), bid(1, 600n, { compliance: 0b00010 })], DEFAULT_LADDERS, checklist, lowestPrice);
+    expect(computeAward([], DEFAULT_LADDERS, checklist, lowestPrice, 0)).toEqual({ compliantBids: 0, medianPrice: null, lowestValidPrice: null, scored: [], ranking: [], winner: null });
+    expect(computeAward([bid(3, 500n)], DEFAULT_LADDERS, checklist, lowestPrice, 0).winner).toBe(3);
+    const none = computeAward([bid(0, 500n, { compliance: 0 }), bid(1, 600n, { compliance: 0b00010 })], DEFAULT_LADDERS, checklist, lowestPrice, 0);
     expect(none.lowestValidPrice).toBeNull();
     expect(none.winner).toBeNull();
     expect(none.scored).toHaveLength(2);
-    expect(computeAward([bid(0, 500n, { disqualified: true })], DEFAULT_LADDERS, checklist, lowestPrice).winner).toBeNull();
+    expect(computeAward([bid(0, 500n, { disqualified: true })], DEFAULT_LADDERS, checklist, lowestPrice, 0).winner).toBeNull();
   });
 
   it('rejects duplicate indices and wrong-sized tables', () => {
-    expect(() => computeAward([bid(1, 1n), bid(1, 2n)], DEFAULT_LADDERS, checklist, lowestPrice)).toThrow();
-    expect(() => computeAward([], DEFAULT_LADDERS, checklist, new Uint8Array(10))).toThrow(RangeError);
+    expect(() => computeAward([bid(1, 1n), bid(1, 2n)], DEFAULT_LADDERS, checklist, lowestPrice, 0)).toThrow();
+    expect(() => computeAward([], DEFAULT_LADDERS, checklist, new Uint8Array(10), 0)).toThrow(RangeError);
   });
 
   it('gives the same award whatever order the bids are processed in', () => {
@@ -198,9 +198,9 @@ describe('award', () => {
         }),
       );
       const table = [lowestPrice, price60, quality70, fastest][next() % 4]!;
-      const reference = computeAward(bids, DEFAULT_LADDERS, checklist, table);
+      const reference = computeAward(bids, DEFAULT_LADDERS, checklist, table, 0);
       const shuffled = [...bids].sort(() => (next() % 2 === 0 ? 1 : -1));
-      expect(computeAward(shuffled, DEFAULT_LADDERS, checklist, table)).toEqual(reference);
+      expect(computeAward(shuffled, DEFAULT_LADDERS, checklist, table, 0)).toEqual(reference);
       // The ranking is a strict total order: every adjacent pair is decided, never equal.
       const byIndex = new Map(reference.scored.map((s) => [s.index, s]));
       for (let i = 1; i < reference.ranking.length; i++) {
