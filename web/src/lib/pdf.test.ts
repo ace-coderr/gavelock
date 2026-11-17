@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { buildPdf } from './pdf.ts';
 
 const text = (b: Uint8Array) => Array.from(b, (c) => String.fromCharCode(c)).join('');
+const BS = String.fromCharCode(92);
 
 describe('pdf writer', () => {
   it('writes a structurally valid file: every xref offset points at its object', () => {
-    const out = text(buildPdf([{ text: 'Hello (world) \ test', size: 14, bold: true }, { text: 'second paragraph' }]));
+    const out = text(buildPdf([{ text: 'Hello (world) test', size: 14, bold: true }, { text: 'second paragraph' }]));
     expect(out.startsWith('%PDF-1.4\n')).toBe(true);
     expect(out.trimEnd().endsWith('%%EOF')).toBe(true);
     const start = Number(/startxref\n(\d+)/.exec(out)![1]);
@@ -16,8 +17,10 @@ describe('pdf writer', () => {
   });
 
   it('escapes parentheses and backslashes, and replaces characters the font cannot show', () => {
-    const out = text(buildPdf([{ text: String.raw.replace('\u2019', '’').replace('\u00e9', 'é') + ' 中' }]));
-    expect(out).toContain(String.raw);
+    // Input: a (b) \ c ’ é 中. Output must escape ( ) and \, turn ’ into ', and show ? for é and 中.
+    const input = `a (b) ${BS} c ’ é 中`;
+    const expected = `(a ${BS}(b${BS}) ${BS}${BS} c ' ? ?)`;
+    expect(text(buildPdf([{ text: input }]))).toContain(expected);
   });
 
   it('paginates long text and wraps long unbroken words', () => {
