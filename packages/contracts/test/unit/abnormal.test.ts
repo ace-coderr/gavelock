@@ -271,7 +271,8 @@ describe("the abnormally low bid rule", () => {
     assert.deepEqual(await stageAfter(3), { stage: 1, walkPos: 3, median: "0", lowest: "0", scoreCursor: 0, awarded: false });
     assert.deepEqual(await stageAfter(2), { stage: 2, walkPos: 5, median: "1000", lowest: "0", scoreCursor: 0, awarded: false });
     assert.deepEqual(await stageAfter(3), { stage: 2, walkPos: 5, median: "1000", lowest: "0", scoreCursor: 0, awarded: false });
-    assert.deepEqual(await stageAfter(1), { stage: 3, walkPos: 5, median: "1000", lowest: "1000", scoreCursor: 0, awarded: false });
+    // One more step passes the fourth flagged bid; the reference is only found when the next bid is looked at.
+    assert.deepEqual(await stageAfter(1), { stage: 2, walkPos: 5, median: "1000", lowest: "0", scoreCursor: 0, awarded: false });
     assert.deepEqual(await stageAfter(10), { stage: 3, walkPos: 5, median: "1000", lowest: "1000", scoreCursor: 10, awarded: false });
     assert.equal((await stageAfter(1)).awarded, true);
     const { state } = await s.assertMatchesCore(id, lowestPrice);
