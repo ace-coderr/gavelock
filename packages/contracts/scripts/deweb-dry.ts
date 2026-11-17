@@ -4,6 +4,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { network } from "hardhat";
 import { formatEther, parseAbi, toHex, type Address, type Hex } from "viem";
 import { TAPEOUT } from "@gavelock/core";
@@ -76,7 +77,7 @@ const openFee = await pub.readContract({ address: TAPEOUT.opener, abi, functionN
 await send("open the site container (circuit #1's account)", TAPEOUT.opener, call("open", [processor, circuitId]), openFee);
 const container = await pub.readContract({ address: TAPEOUT.opener, abi, functionName: "accountOf", args: [processor, circuitId] });
 
-const root = path.resolve(new URL(dist).pathname.replace(/^\/([A-Za-z]:)/, "$1"));
+const root = fileURLToPath(dist);
 const files = listFiles(root).sort((a, b) => (a === "index.html" ? -1 : b === "index.html" ? 1 : a.localeCompare(b)));
 let totalBytes = 0;
 const manifest: { path: string; bytes: number; chunks: number; sha256: string }[] = [];

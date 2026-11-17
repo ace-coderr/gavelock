@@ -19,8 +19,8 @@ Updated 16 November 2026. To resume in a new session: read this file and `docs/P
 | 5 | MCP package | Done 17 November (9 tests, stdio round trip). |
 | 6 | Audit pass | Done 17 November: docs/AUDIT.md. |
 | 7 | Mainnet plan, Gate B, deploy, real tenders | **At Gate B: docs/GATE-B.md. Nothing sent to mainnet.** |
-| 8 | DeWEB dry run, Gate C | Not started |
-| 9 | README + docs/SUBMISSION.md | Not started |
+| 8 | DeWEB dry run, Gate C | **Dry run done: docs/GATE-C.md (977,312 bytes, 48 transactions, about 0.085 OKB). Waiting for Gate B, then approval.** |
+| 9 | README + docs/SUBMISSION.md | README done (deployment fields fill in after Gate B); SUBMISSION.md not written yet. |
 
 ## Live site
 
@@ -30,7 +30,7 @@ https://ace-coderr.github.io/gavelock/ is deployed by `.github/workflows/deploy.
 
 - Gate A (cost table): **approved** 16 November 2026. Nothing has been spent.
 - Gate B (mainnet deploy): **table ready, waiting for approval**: docs/GATE-B.md (fees re-read 17 November; buy 0.12 BEM; hold about 0.06 OKB in total). BEM is bought by the owner at Gate B, not before. At Gate B: re-read the live fees, say exactly where to swap and how much.
-- Gate C (DeWEB dry run): not reached.
+- Gate C (DeWEB dry run): **dry run done, waiting for approval**: docs/GATE-C.md.
 
 ## Conditions set at Gate A (binding for Task 3)
 

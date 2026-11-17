@@ -3,33 +3,33 @@
   "rows": [
     {
       "case": "finalize, 3 bids, rule on, one call",
-      "gas": "364093",
-      "okb": "0.000007281860364093"
+      "gas": "364027",
+      "okb": "0.000007280540364027"
     },
     {
       "case": "finalize, 3 bids, rule on, pages of 10 (1 calls, largest call)",
-      "gas": "364081",
-      "okb": "0.000007281620364081"
+      "gas": "364015",
+      "okb": "0.000007280300364015"
     },
     {
       "case": "open 3 bids with exact hints, rule on (average per bid)",
-      "gas": "140892",
-      "okb": "0.000002817840140892"
+      "gas": "140893",
+      "okb": "0.000002817860140893"
     },
     {
       "case": "finalize, 3 bids, rule off, one call",
-      "gas": "355770",
-      "okb": "0.00000711540035577"
+      "gas": "355704",
+      "okb": "0.000007114080355704"
     },
     {
       "case": "finalize, 3 bids, rule off, pages of 10 (1 calls, largest call)",
-      "gas": "355758",
-      "okb": "0.000007115160355758"
+      "gas": "355692",
+      "okb": "0.000007113840355692"
     },
     {
       "case": "open 3 bids with exact hints, rule off (average per bid)",
-      "gas": "140892",
-      "okb": "0.000002817840140892"
+      "gas": "140893",
+      "okb": "0.000002817860140893"
     },
     {
       "case": "the rule adds, at 3 bids",
@@ -38,33 +38,33 @@
     },
     {
       "case": "finalize, 10 bids, rule on, one call",
-      "gas": "887394",
-      "okb": "0.000017747880887394"
+      "gas": "887328",
+      "okb": "0.000017746560887328"
     },
     {
       "case": "finalize, 10 bids, rule on, pages of 10 (2 calls, largest call)",
-      "gas": "494552",
-      "okb": "0.000009891040494552"
+      "gas": "494486",
+      "okb": "0.000009889720494486"
     },
     {
       "case": "open 10 bids with exact hints, rule on (average per bid)",
-      "gas": "139736",
-      "okb": "0.000002794720139736"
+      "gas": "139735",
+      "okb": "0.000002794700139735"
     },
     {
       "case": "finalize, 10 bids, rule off, one call",
-      "gas": "871127",
-      "okb": "0.000017422540871127"
+      "gas": "871061",
+      "okb": "0.000017421220871061"
     },
     {
       "case": "finalize, 10 bids, rule off, pages of 10 (1 calls, largest call)",
-      "gas": "871115",
-      "okb": "0.000017422300871115"
+      "gas": "871049",
+      "okb": "0.000017420980871049"
     },
     {
       "case": "open 10 bids with exact hints, rule off (average per bid)",
-      "gas": "139736",
-      "okb": "0.000002794720139736"
+      "gas": "139738",
+      "okb": "0.000002794760139738"
     },
     {
       "case": "the rule adds, at 10 bids",
@@ -73,28 +73,28 @@
     },
     {
       "case": "finalize, 50 bids, rule on, one call",
-      "gas": "3865105",
-      "okb": "0.000077302103865105"
+      "gas": "3865039",
+      "okb": "0.000077300783865039"
     },
     {
       "case": "finalize, 50 bids, rule on, pages of 10 (8 calls, largest call)",
-      "gas": "816184",
-      "okb": "0.000016323680816184"
+      "gas": "816118",
+      "okb": "0.000016322360816118"
     },
     {
       "case": "open 50 bids with exact hints, rule on (average per bid)",
-      "gas": "140233",
-      "okb": "0.000002804660140233"
+      "gas": "140234",
+      "okb": "0.000002804680140234"
     },
     {
       "case": "finalize, 50 bids, rule off, one call",
-      "gas": "3810099",
-      "okb": "0.000076201983810099"
+      "gas": "3810033",
+      "okb": "0.000076200663810033"
     },
     {
       "case": "finalize, 50 bids, rule off, pages of 10 (5 calls, largest call)",
-      "gas": "850132",
-      "okb": "0.000017002640850132"
+      "gas": "850066",
+      "okb": "0.000017001320850066"
     },
     {
       "case": "open 50 bids with exact hints, rule off (average per bid)",
@@ -108,13 +108,13 @@
     },
     {
       "case": "open the 50th (most expensive) bid, exact hint",
-      "gas": "139548",
-      "okb": "0.000002790960139548"
+      "gas": "139549",
+      "okb": "0.000002790980139549"
     },
     {
       "case": "open the 50th (most expensive) bid, no hint",
-      "gas": "366612",
-      "okb": "0.000007332240366612"
+      "gas": "366613",
+      "okb": "0.000007332260366613"
     }
   ]
 }
