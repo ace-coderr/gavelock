@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink } from '../lib/router.tsx';
 
 const links = [
   { to: '/', label: 'Tender Board', end: true },

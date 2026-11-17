@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../lib/router.tsx';
 import { INPUT_SPACE } from '@gavelock/core';
 import { deployed, verifyAward, type Verification } from '../lib/records.ts';
 

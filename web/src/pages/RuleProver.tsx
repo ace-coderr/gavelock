@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams } from '../lib/router.tsx';
 import { DEPLOYMENT, INPUT_SPACE, isDeployed, packBanded, unpackBanded, unpackOutcome, type Banded } from '@gavelock/core';
 import { explorerAddress } from '@gavelock/core';
 import { readCircuitShape, readTruthTable, type TableRead } from '../lib/rules.ts';

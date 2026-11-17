@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router';
+import { Link } from '../lib/router.tsx';
 import { DEPLOYMENT, STARTER_RULES, isDeployed, latestRoundAt, truthTable } from '@gavelock/core';
 import { InlinePic, RuleGridPic, SealPic } from '../components/Pictures.tsx';
 import { NetworkPanel } from '../components/NetworkPanel.tsx';

@@ -5,6 +5,7 @@ import { XLAYER, randomSalt, tenderPanelAbi } from '@gavelock/core';
 import { shortAddress } from '../../lib/format.ts';
 import { live, type TenderDetail } from '../../lib/tender.ts';
 import { useWallet } from '../../lib/wallet.tsx';
+import { PanelSeats } from '../../components/PanelSeats.tsx';
 import { TxButton } from '../../components/TxButton.tsx';
 
 const key = (id: bigint, account: string) => `gavelock:scores:${id}:${account.toLowerCase()}`;
@@ -39,6 +40,10 @@ export function Panel({ tender, onChanged }: { tender: TenderDetail; onChanged: 
   return (
     <div className="stack">
       <p className="notice">Each panel member commits a hidden score from 0 to 100 for every bid, then reveals it. The contract takes the median of the revealed scores. {r.quorum} of {r.panelSize} must reveal.</p>
+      <PanelSeats seats={tender.panelStatus.map((m) => ({ address: m.address, state: m.revealed ? 'revealed' : m.committed ? 'committed' : 'empty', you: m.address.toLowerCase() === me }))} />
+      <p style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>
+        {tender.panelStatus.filter((m) => m.committed).length} of {tender.panel.length} committed · {tender.panelStatus.filter((m) => m.revealed).length} revealed
+      </p>
       <ul className="stack">
         {tender.panel.map((member, k) => (
           <li key={member} className="card"><span className="mono">{shortAddress(member)}</span> · seat {k + 1}{member.toLowerCase() === me ? ' (you)' : ''}</li>

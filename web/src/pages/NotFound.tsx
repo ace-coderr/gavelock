@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation } from '../lib/router.tsx';
 
 export function NotFound() {
   const { pathname } = useLocation();

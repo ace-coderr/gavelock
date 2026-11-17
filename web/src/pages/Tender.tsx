@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams } from '../lib/router.tsx';
 import { DEPLOYMENT, isDeployed } from '@gavelock/core';
+import { RuleGridLive } from '../components/RuleGridLive.tsx';
+import { Countdown, NumberCard, SealReceipt } from '../components/Receipt.tsx';
+import { SplitSection, type SplitRow } from '../components/SplitSection.tsx';
 import { formatInteger, shortAddress } from '../lib/format.ts';
 import { PHASE_HELP } from '../lib/tenders.ts';
-import { readTender } from '../lib/tender.ts';
+import { readTender, type TenderDetail } from '../lib/tender.ts';
 import { useAsync } from '../lib/useAsync.ts';
+import { AuditPack } from './tender/AuditPack.tsx';
+import { Award } from './tender/Award.tsx';
 import { BidRoom } from './tender/BidRoom.tsx';
 import { Clarifications } from './tender/Clarifications.tsx';
 import { Documents } from './tender/Documents.tsx';
-import { Award } from './tender/Award.tsx';
-import { AuditPack } from './tender/AuditPack.tsx';
 import { Opening } from './tender/Opening.tsx';
 import { Panel } from './tender/Panel.tsx';
 
@@ -18,6 +21,51 @@ type Tab = (typeof TABS)[number];
 
 function when(unixSeconds: bigint | number): string {
   return new Date(Number(unixSeconds) * 1000).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function Facts({ t }: { t: TenderDetail }) {
+  const r = t.raw;
+  return (
+    <dl className="facts" style={{ gridTemplateColumns: '1fr' }}>
+      <div className="fact"><dt className="fact__label">Kind</dt><dd className="fact__value">{r.quick ? 'Quick Quote' : 'Full tender'}</dd></div>
+      <div className="fact"><dt className="fact__label">Deadline (frozen)</dt><dd className="fact__value">{when(r.deadline)} · <Countdown until={Number(r.deadline)} /></dd></div>
+      <div className="fact"><dt className="fact__label">Rule circuit</dt><dd className="fact__value"><Link to={`/rules/${r.ruleId}`} className="mono">#{r.ruleId}</Link></dd></div>
+      <div className="fact"><dt className="fact__label">Bid deposit</dt><dd className="fact__value mono">{r.bidDeposit.toString()} wei</dd></div>
+      <div className="fact"><dt className="fact__label">Buyer</dt><dd className="fact__value"><Link to={`/buyers/${r.buyer}`} className="mono">{shortAddress(r.buyer)}</Link></dd></div>
+      <div className="fact"><dt className="fact__label">Abnormally low floor</dt><dd className="fact__value">{r.abnormalFloorBps === 0 ? 'Off' : `${r.abnormalFloorBps / 100}% of the median`}</dd></div>
+    </dl>
+  );
+}
+
+/** The bids, one row each. A row's detail is its seal receipt while sealed, or its place in the rule's grid once opened. */
+function BidsSplit({ t }: { t: TenderDetail }) {
+  const r = t.raw;
+  const rows: SplitRow[] = t.bids.map((b) => ({
+    key: String(b.index),
+    name: `Bid ${b.index + 1}`,
+    sub: b.disqualified ? 'Disqualified' : b.opened ? `Opened · price ${b.price.toString()}` : 'Sealed',
+    detail: b.opened ? (
+      <>
+        <RuleGridLive ruleId={r.ruleId} marker={b.ruleInput} label={`Every outcome of rule circuit ${r.ruleId}, with bid ${b.index + 1}'s case marked`} />
+        <p style={{ marginTop: 'var(--space-3)' }}>
+          {b.eligible ? `Eligible, score ${b.score} of 15.` : 'Not eligible.'}
+          {b.abnormallyLow ? ' Flagged: abnormally low price.' : ''} The outlined cell is the case this bid landed in.
+        </p>
+      </>
+    ) : (
+      <SealReceipt
+        title={`Bid ${b.index + 1}`}
+        seed={b.commitment}
+        rows={[
+          ['Ciphertext', `${b.ciphertextBytes} bytes`],
+          ['Commitment', `${b.commitment.slice(0, 10)}…${b.commitment.slice(-4)}`],
+          ['Sealed in block', b.sealedBlock.toString()],
+          ['Opens', Date.now() / 1000 < Number(r.deadline) ? <Countdown until={Number(r.deadline)} /> : 'now'],
+        ]}
+      />
+    ),
+  }));
+  return <SplitSection title={<>The <em>bids</em></>} side={<Facts t={t} />} rows={rows} />;
 }
 
 export function Tender() {
@@ -44,9 +92,10 @@ export function Tender() {
   const t = detail.data;
   if (!t) return <p className="notice">There is no tender {id} on this contract.</p>;
   const r = t.raw;
+  const firstSealed = t.bids.find((b) => !b.opened) ?? t.bids[0];
 
   return (
-    <div className="stack stagger">
+    <div className="stack">
       <header className="page__head">
         <span className="eyebrow">
           <Link to="/">Tender Board</Link> · Tender {id}
@@ -60,18 +109,32 @@ export function Tender() {
         {t.cancelReason && <p className="notice notice--danger">Cancelled: {t.cancelReason}</p>}
       </header>
 
-      <section className="card">
-        <dl className="facts">
-          <div className="fact"><dt className="fact__label">Kind</dt><dd className="fact__value">{r.quick ? 'Quick Quote' : 'Full tender'}</dd></div>
-          <div className="fact"><dt className="fact__label">Buyer</dt><dd className="fact__value"><Link to={`/buyers/${r.buyer}`} className="mono">{shortAddress(r.buyer)}</Link></dd></div>
-          <div className="fact"><dt className="fact__label">Bidding opens</dt><dd className="fact__value">{when(r.biddingStart)}</dd></div>
-          <div className="fact"><dt className="fact__label">Deadline (frozen)</dt><dd className="fact__value">{when(r.deadline)}</dd></div>
-          <div className="fact"><dt className="fact__label">Bid deposit</dt><dd className="fact__value mono">{r.bidDeposit.toString()} wei</dd></div>
-          <div className="fact"><dt className="fact__label">Bids</dt><dd className="fact__value mono">{formatInteger(t.bids.length)} sealed · {formatInteger(r.openedCount)} opened</dd></div>
-          <div className="fact"><dt className="fact__label">Rule circuit</dt><dd className="fact__value"><Link to={`/rules/${r.ruleId}`} className="mono">#{r.ruleId}</Link></dd></div>
-          <div className="fact"><dt className="fact__label">Abnormally low floor</dt><dd className="fact__value">{r.abnormalFloorBps === 0 ? 'Off' : `${r.abnormalFloorBps / 100}% of the median compliant price`}</dd></div>
-        </dl>
-      </section>
+      <div className="floats" aria-label="Receipts">
+        <div className="float" style={{ ['--tilt' as string]: '-3deg', ['--drift' as string]: '-0.035' }}>
+          <NumberCard id={id!} rows={[['Stage', t.phase], ['Bids sealed', formatInteger(t.bids.length)], ['Bids opened', formatInteger(r.openedCount)]]} />
+        </div>
+        {firstSealed && (
+          <div className="float" style={{ ['--tilt' as string]: '2.5deg', ['--drift' as string]: '-0.055' }}>
+            <SealReceipt
+              title={`Bid ${firstSealed.index + 1}`}
+              seed={firstSealed.commitment}
+              rows={[
+                ['Ciphertext', `${firstSealed.ciphertextBytes} bytes`],
+                ['Commitment', `${firstSealed.commitment.slice(0, 10)}…${firstSealed.commitment.slice(-4)}`],
+                ['State', firstSealed.opened ? 'Opened' : 'Sealed'],
+              ]}
+            />
+          </div>
+        )}
+      </div>
+
+      {t.bids.length > 0 ? (
+        <BidsSplit t={t} />
+      ) : (
+        <section className="card">
+          <Facts t={t} />
+        </section>
+      )}
 
       <nav className="nav__links" style={{ marginLeft: 0, flexWrap: 'wrap' }} aria-label="Tender sections" role="tablist">
         {TABS.map((name) => (

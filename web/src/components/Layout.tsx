@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation } from '../lib/router.tsx';
 import { useScrollVariable } from '../lib/motion.ts';
 import { Navbar } from './Navbar.tsx';
 import { Footer } from './Footer.tsx';

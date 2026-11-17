@@ -1,5 +1,6 @@
-import { Link } from 'react-router';
+import { Link } from '../lib/router.tsx';
 import { DEPLOYMENT, STARTER_RULES, compileRule, isDeployed, truthTable } from '@gavelock/core';
+import { DragRow } from '../components/Controls.tsx';
 import { RuleBuilder } from '../components/RuleBuilder.tsx';
 import { shortAddress } from '../lib/format.ts';
 import { listOnChainRules } from '../lib/rules.ts';
@@ -25,9 +26,9 @@ export function Rules() {
 
       <section className="stack" aria-label="Starter rules">
         <h2 className="card__title">Starter rules</h2>
-        <ul className="stack">
+        <DragRow label="Starter rules">
           {STARTER_RULES.map((rule, k) => (
-            <li key={rule.key} className="card">
+            <article key={rule.key} className="card">
               <div className="card__head">
                 <h3 className="card__title">{rule.name}</h3>
                 <span className="status status--pending">{rule.mode === 'quick' ? 'Quick Quote' : 'Full tender'}</span>
@@ -48,9 +49,9 @@ export function Rules() {
                   </dd>
                 </div>
               </dl>
-            </li>
+            </article>
           ))}
-        </ul>
+        </DragRow>
       </section>
 
       <RuleBuilder />
@@ -73,9 +74,9 @@ export function Rules() {
         ) : onChain.data!.length === 0 ? (
           <p className="notice">No rule has been taped out yet.</p>
         ) : (
-          <ul className="stack">
+          <DragRow label="Rules on chain">
             {onChain.data!.map((rule) => (
-              <li key={rule.id} className="card">
+              <article key={rule.id} className="card">
                 <div className="card__head">
                   <h3 className="card__title">{rule.label || `Circuit ${rule.id}`}</h3>
                   <Link className="button" to={`/rules/${rule.id}`}>
@@ -96,9 +97,9 @@ export function Rules() {
                     <dd className="fact__value mono">{shortAddress(rule.author)}</dd>
                   </div>
                 </dl>
-              </li>
+              </article>
             ))}
-          </ul>
+          </DragRow>
         )}
       </section>
     </div>

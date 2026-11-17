@@ -3,6 +3,8 @@ import { encodeFunctionData } from 'viem';
 import { gavelockAbi, openingHint, QUICKNET, roundTime, type Bid, type Checklist, type OpenedBid } from '@gavelock/core';
 import { shortAddress } from '../../lib/format.ts';
 import { fetchCiphertext, live, type BidRecord, type TenderDetail } from '../../lib/tender.ts';
+import { GlassWipe } from '../../components/GlassWipe.tsx';
+import { Countdown, SealReceipt } from '../../components/Receipt.tsx';
 import { TxButton } from '../../components/TxButton.tsx';
 
 function checklistOf(t: TenderDetail): Checklist {
@@ -101,11 +103,52 @@ function BidRow({ tender, bid, onChanged }: { tender: TenderDetail; bid: BidReco
   );
 }
 
+/**
+ * The bids behind frosted glass. Before the deadline the glass shows only what the chain holds about a sealed bid:
+ * its ciphertext size, its commitment and the time left. After the deadline it shows the opened bids as read from
+ * the chain. "Opened" replaces "Sealed" in the lettering only once at least one bid has really been opened.
+ */
+function BidsGlass({ tender }: { tender: TenderDetail }) {
+  const deadline = Number(tender.raw.deadline);
+  const past = Date.now() / 1000 >= deadline;
+  const anyOpened = tender.bids.some((b) => b.opened);
+  return (
+    <GlassWipe word={past && anyOpened ? 'Opened' : 'Sealed'} hint="The bids are behind frosted glass. Use the Clear the glass button to see them without wiping.">
+      <div className="floats" style={{ paddingBlock: 0, justifyContent: 'flex-start' }}>
+        {tender.bids.map((b) =>
+          b.opened ? (
+            <div className="receipt" key={b.index}>
+              <span className="receipt__label">Opened bid</span>
+              <span className="receipt__big">Bid {b.index + 1}</span>
+              <div className="receipt__row"><span>Price (minor units)</span><span className="mono">{b.price.toString()}</span></div>
+              <div className="receipt__row"><span>Delivery</span><span className="mono">{b.deliveryDays} days</span></div>
+              <div className="receipt__row"><span>Opened in block</span><span className="mono">{b.openedBlock.toString()}</span></div>
+            </div>
+          ) : (
+            <SealReceipt
+              key={b.index}
+              title={`Bid ${b.index + 1}`}
+              seed={b.commitment}
+              rows={[
+                ['Ciphertext', `${b.ciphertextBytes} bytes`],
+                ['Commitment', `${b.commitment.slice(0, 10)}…${b.commitment.slice(-4)}`],
+                ['Sealed in block', b.sealedBlock.toString()],
+                [past ? 'Deadline' : 'Time left', past ? 'passed' : <Countdown until={deadline} />],
+              ]}
+            />
+          ),
+        )}
+      </div>
+    </GlassWipe>
+  );
+}
+
 export function Opening({ tender, onChanged }: { tender: TenderDetail; onChanged: () => void }) {
   const beforeDeadline = Date.now() / 1000 < Number(tender.raw.deadline);
   if (tender.bids.length === 0) return <p className="empty">There are no bids to open.</p>;
   return (
     <div className="stack">
+      <BidsGlass tender={tender} />
       {beforeDeadline && <p className="notice">Bids open after the deadline. Until then they are encrypted to drand round {tender.raw.drandRound.toString()} of {QUICKNET.scheme}, which does not exist yet.</p>}
       <ul className="stack">
         {tender.bids.map((b) => <BidRow key={b.index} tender={tender} bid={b} onChanged={onChanged} />)}

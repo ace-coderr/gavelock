@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router';
+import { Link, useParams } from '../lib/router.tsx';
 import { isAddress, type Address } from 'viem';
 import { supplierPassport, deployed } from '../lib/records.ts';
 import { useAsync } from '../lib/useAsync.ts';

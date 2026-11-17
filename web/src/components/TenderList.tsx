@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Link } from '../lib/router.tsx';
+import { DragRow } from './Controls.tsx';
 import { shortAddress, formatInteger } from '../lib/format.ts';
 import { PHASE_HELP, listTenders } from '../lib/tenders.ts';
 import { useAsync } from '../lib/useAsync.ts';
@@ -50,11 +52,11 @@ export function TenderList() {
           Could not refresh: {result.error}. Showing the last list that loaded.
         </div>
       )}
-      <ul className="stack stagger">
+      <DragRow label="Tenders">
         {items.map((t) => (
-          <li key={t.id.toString()} className="card">
+          <article key={t.id.toString()} className="card">
             <div className="card__head">
-              <h2 className="card__title">{t.title ?? `Tender ${t.id}`}</h2>
+              <h2 className="card__title"><Link to={`/t/${t.id}`}>{t.title ?? `Tender ${t.id}`}</Link></h2>
               <span className={`status ${t.phase === 'Cancelled' ? 'status--danger' : t.phase === 'Final' ? 'status--ok' : 'status--pending'}`} title={PHASE_HELP[t.phase]}>
                 {t.phase}
               </span>
@@ -77,9 +79,9 @@ export function TenderList() {
                 <dd className="fact__value mono">{shortAddress(t.buyer)}</dd>
               </div>
             </dl>
-          </li>
+          </article>
         ))}
-      </ul>
+      </DragRow>
       <div className="card__head">
         <button type="button" className="button" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE))}>
           Newer

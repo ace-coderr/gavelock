@@ -22,6 +22,8 @@ export interface BidRecord {
   index: number;
   bidder: Address;
   sealedBlock: bigint;
+  /** Block the bid was opened in; 0 while it is still sealed. */
+  openedBlock: bigint;
   commitment: Hex;
   ciphertext: Address;
   opened: boolean;
@@ -37,6 +39,8 @@ export interface BidRecord {
   ruleInput: number;
   note: string | null;
   recipient: Address | null;
+  /** Size of the sealed ciphertext stored on chain, in bytes. */
+  ciphertextBytes: number;
 }
 
 export interface QuestionRecord {
@@ -78,6 +82,8 @@ export interface TenderDetail {
   raw: Awaited<ReturnType<typeof readRaw>>;
   terms: TenderTerms | null;
   panel: Address[];
+  /** Where each panel member is: nothing yet, committed, or revealed. In seat order. */
+  panelStatus: { address: Address; committed: boolean; revealed: boolean }[];
   bids: BidRecord[];
   documents: DocumentRecord[];
   questions: QuestionRecord[];
@@ -117,6 +123,7 @@ export async function readTender(id: bigint): Promise<TenderDetail | null> {
       index,
       bidder: b.bidder,
       sealedBlock: b.sealedBlock,
+      openedBlock: b.openedBlock,
       commitment: b.commitment,
       ciphertext: b.ciphertext,
       opened: b.opened,
@@ -132,6 +139,7 @@ export async function readTender(id: bigint): Promise<TenderDetail | null> {
       ruleInput: b.ruleInput,
       note: b.note === '0x0000000000000000000000000000000000000000' ? null : await readText(b.note).catch(() => null),
       recipient: null,
+      ciphertextBytes: await publicClient.getCode({ address: b.ciphertext }).then((c) => Math.max(0, ((c?.length ?? 2) - 2) / 2 - 1)).catch(() => 0),
     })),
   );
   const documents: DocumentRecord[] = docRows.map((x, index) => ({ index, name: x.name, contentType: x.contentType, size: x.size, received: x.received, sha256Hash: x.sha256Hash, completedBlock: x.completedBlock, chunks: [...x.chunks] }));
@@ -142,7 +150,11 @@ export async function readTender(id: bigint): Promise<TenderDetail | null> {
     cRows.map(async (c, index) => ({ index, challenger: c.challenger, bidIndex: c.bidIndex, kind: c.kind, ruling: c.ruling, bondPaid: c.bondPaid, filedBlock: c.filedBlock, ruledBlock: c.ruledBlock, reason: await readText(c.reason).catch(() => '(unreadable)'), rulingReason: c.ruling !== 0 ? await readText(c.rulingReason).catch(() => '(unreadable)') : null })),
   );
   const cancelReason = raw.cancelled ? await readText(raw.cancelReason).catch(() => null) : null;
-  return { id, phase: PHASES[Number(phase)] ?? 'Published', raw, terms, panel: [...panel], bids, documents, questions, challenges, cancelReason };
+  const memberRows = panel.length
+    ? await publicClient.multicall({ allowFailure: false, contracts: panel.map((m) => ({ address: d.panel, abi: tenderPanelAbi, functionName: 'memberOf', args: [id, m] }) as const) })
+    : [];
+  const panelStatus = panel.map((address, i) => ({ address, committed: memberRows[i]!.committedBlock !== 0n, revealed: memberRows[i]!.revealedBlock !== 0n }));
+  return { id, phase: PHASES[Number(phase)] ?? 'Published', raw, terms, panel: [...panel], panelStatus, bids, documents, questions, challenges, cancelReason };
 }
 
 /** Download every chunk of a document and check it against the SHA-256 recorded on chain. */
