@@ -94,6 +94,10 @@ The TypeScript in `packages/core` is the specification; contract tests compare t
 
 - One continuous dial from hero to footer (`web/src/components/LandingWheel.tsx`, scenes in `DialScenes.tsx`), replacing both wheels; new headline pictures (`HeadlinePics.tsx`); rewritten footer, builder byline removed everywhere. Audit in docs/AUDIT.md. Bundle 998,839 bytes (little room left). Open: phone frame rate, real-touch check, sound heard.
 
+## Large wheel and headline pictures (18 November)
+
+- Hero dial back to a large, cropped dial (active stage at its left, or at its top on narrow screens), solid navbar, headline pictures finished by default with captions under the headline. See docs/AUDIT.md for what was and was not re-verified (scroll, dock and frame rate need re-checking in a visible browser). Bundle 1,000,458 bytes; the 700 KB goal is not met (breakdown in the audit).
+
 ## What exists
 
 - Root npm workspaces: `packages/core` (chain constants, deployment record, drand rounds, rule layout / form / NAND compiler / netlist codec and simulator, bid encoding and commitment, banding, reference award, time-lock sealing; 60 tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.

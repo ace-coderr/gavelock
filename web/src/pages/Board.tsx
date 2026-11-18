@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from '../lib/router.tsx';
 import { DEPLOYMENT, STARTER_RULES, isDeployed, latestRoundAt, truthTable } from '@gavelock/core';
-import { HeadlinePic, LockPic, RuleMiniPic } from '../components/HeadlinePics.tsx';
+import { PicHeadline } from '../components/HeadlinePics.tsx';
 import { LandingWheel, WheelFinalSlot } from '../components/LandingWheel.tsx';
 import { RuleGridPic, SealPic } from '../components/Pictures.tsx';
 import { NetworkPanel } from '../components/NetworkPanel.tsx';
@@ -90,19 +90,7 @@ export function Board() {
 
       <section className="band" aria-labelledby="pics-title">
         <div className="container stack">
-          <Reveal as="h2" className="display band__title">
-            <span id="pics-title" style={{ fontSize: 'var(--text-3xl)', lineHeight: 1.3, display: 'block', maxWidth: '18ch' }}>
-              A sealed
-              <HeadlinePic caption="Locked with a time-lock until the deadline.">
-                <LockPic />
-              </HeadlinePic>{' '}
-              bid, a public
-              <HeadlinePic caption="Anyone can see every outcome.">
-                <RuleMiniPic words={explainerWords} />
-              </HeadlinePic>{' '}
-              rule, a result <em>anyone can check.</em>
-            </span>
-          </Reveal>
+          <PicHeadline words={explainerWords} />
           <Reveal as="p" className="lede">
             Both pictures play from real values: the rows come from every outcome of a rule, computed in your browser, and the dial above is drawn from the same rule and the current drand round.
           </Reveal>

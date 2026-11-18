@@ -234,3 +234,46 @@ What would be needed: React's DOM library alone is 207 KB. Swapping it for Preac
 components through a compatibility alias) would save roughly 190 KB, but it adds two new packages, so it needs
 the owner's approval; even then the total is about 810 KB, so 700 KB would also need viem replaced by a small
 hand-written client for the dozen calls the app makes. Neither was done.
+
+# Large wheel and headline pictures (18 November 2026)
+
+## What changed
+
+- **The hero dial is large again.** On screens 1024 px and wider the dial is about 1.1 to 1.25 times the viewport
+  height, centred vertically in the pinned area, and bleeds off the top, right and bottom. Its active stage now sits at
+  the **left** edge of the ring, next to the copy, with the needle and the numeral upright, so the crop only ever
+  cuts the far side of the ring. Under 1024 px the copy is above the dial, the active stage sits at the **top**, and the dial
+  bleeds off the bottom and sides. The ring turns smoothly to the top as it docks, and the docked and final states are unchanged.
+- **Sizing rule.** The radius is the smaller of 0.625 of the viewport height and what leaves the whole central
+  picture (about 0.56 of the radius either side of the centre) on screen, clear of the copy. The picture, needle and
+  active numeral can therefore never be cropped; only the far ring can.
+- **Navbar.** It is now solid (no transparency), and the pinned hero starts at the navbar's bottom edge. The dial sits under the navbar,
+  except when docked.
+- **Headline pictures.** Both are finished by default: the padlock is closed and the rule table full. The animation
+  only starts from an earlier state when a picture scrolls into view and ends on the finished state, so without script, with
+  reduced motion, with a slow page or when scrolled back it rests finished. Each pill is sized to its content, 1.2 times the
+  headline's text size, aligned to the text. The rule pill is a table of five inputs (11 bits each) and the score the rule
+  gives each, and was enlarged rather than shrunk. Both captions sit in one row under the headline, in one style, each starting with the
+  picture's name; on a phone they are hidden until the picture is tapped.
+
+## Measured
+
+| Check | Result |
+|---|---|
+| Hero fit, screenshots after the change | 1920x1080, 1440x900, 1366x768, 768x1024, 375x667: needle, active numeral and the whole central picture on screen, dial cropped at the far side, navbar not overlapped. Before screenshots were taken at 1920, 1440 and 1366 (the earlier small dial); the 768 and 375 "before" were the previous pass. |
+| First attempt at 768x1024 | The scene caption was cut at the bottom; the allowance for the caption was widened and re-checked (fixed). |
+| Headline pictures, desktop (1440, text 88 px) | Pills 106 px high (1.2 em), grid pill 342x106, lock pill 118x106; headline bottom 1846, captions row at 1870: no overlap; both captions shown; the shackle rests with no transform (closed). |
+| Headline pictures, phone (375) | Screenshot: lock closed, table readable, pills fit in the line; captions hidden until tapped; after tapping the lock, its caption appears under the headline. |
+| Typecheck, 11 web tests, contrast (23 pairs) | Pass. |
+| Bundle | 1,000,458 bytes in 8 files (initial load 838,939). This is 0.95 MiB; it is a few hundred bytes over 1,000,000, so it is not "under 1 MB" if 1 MB means a million bytes. |
+
+## Not verified
+
+- The browser pane stopped drawing and running animation frames during the second half of this pass, so after the
+  geometry change I did **not** re-run: the scroll through the pinned hero, the dock and final transitions, drag with
+  momentum, and the frame-rate measurement. The code for those paths is unchanged except that the dial now also rotates
+  between its left and top orientations (`-90` degrees times one minus the dock or final progress), which should be seen moving.
+- A desktop screenshot of the finished headline pictures was not captured (the pane failed to draw); the desktop figures above
+  are measured from the page.
+- Keyboard and reduced motion were not repeated after this change.
+- Nothing was run on a real phone.

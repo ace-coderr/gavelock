@@ -76,10 +76,13 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
   const hero = useRef<HTMLElement>(null);
   const stick = useRef<HTMLDivElement>(null);
   const slot = useRef<HTMLDivElement>(null);
+  const copy = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const ring = useRef<SVGGElement>(null);
   const slow = useRef<SVGGElement>(null);
+  const orientG = useRef<SVGGElement>(null);
+  const glyphs = useRef<(SVGTextElement | null)[]>([]);
   const needle = useRef<SVGPathElement>(null);
   const flash = useRef<SVGCircleElement>(null);
   const [stage, setStage] = useState(0);
@@ -89,7 +92,7 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
   const liveIndex = live ? stageIndex(live.phase) : null;
 
   // Everything that changes on every frame lives in one ref, so a frame never waits for React.
-  const sim = useRef({ cur: 0, vel: 0, manual: 0, lastScroll: 0, dockTarget: N - 1, shown: 0, mode: 'hero' as Mode, raf: 0, last: 0, timer: 0, transform: '', dragging: false, fling: 0, pinned: false, range: 1, heroTop: 0 });
+  const sim = useRef({ cur: 0, vel: 0, manual: 0, lastScroll: 0, dockTarget: N - 1, shown: 0, mode: 'hero' as Mode, raf: 0, last: 0, timer: 0, transform: '', dragging: false, fling: 0, pinned: false, side: false, orient: 0, range: 1, heroTop: 0 });
   const sectionRef = useRef(sectionStage);
   sectionRef.current = sectionStage;
   const reducedRef = useRef(reduced);
@@ -107,9 +110,10 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
     s.raf = 0;
     const el = box.current;
     const slotEl = slot.current;
+    const copyEl = copy.current;
     const stickEl = stick.current;
     const heroEl = hero.current;
-    if (!el || !slotEl || !stickEl || !heroEl) return;
+    if (!el || !slotEl || !stickEl || !heroEl || !copyEl) return;
     const reducedNow = reducedRef.current;
     const vw = document.documentElement.clientWidth;
     const vh = window.innerHeight;
@@ -120,13 +124,15 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
     const finalR = finalEl?.getBoundingClientRect() ?? null;
     const splitR = document.querySelector<HTMLElement>('[data-wheel-split]')?.getBoundingClientRect() ?? null;
 
-    const hs = Math.min(slotR.width, slotR.height);
+    let hs = Math.min(slotR.width, slotR.height);
     let x = slotR.left + (slotR.width - hs) / 2;
     let y = slotR.top + (slotR.height - hs) / 2;
     let size = hs;
     let next: Mode = 'hero';
     let target = 0;
     let p = 0;
+    let e1v = 0;
+    let e2v = 0;
 
     if (reducedNow) {
       // No pinning, no docking: the dial sits in its hero slot, then in the final slot, and nowhere in between.
@@ -151,8 +157,31 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
       p = clamp((navH - heroR.top) / range, 0, 1);
       const d = clamp((vh - heroR.bottom) / (0.7 * stickR.height), 0, 1);
       const u = finalR ? clamp((vh - finalR.top) / (finalR.height + 0.15 * vh), 0, 1) : 0;
-      // Where the slot would be if the hero were pinned: the dial stays there while the hero scrolls away.
-      y = slotR.top - stickR.top + navH + (slotR.height - hs) / 2;
+      // The big dial. Beside the copy (wide screens) its active stage sits at its left edge and the far side of the ring
+      // bleeds off the right edge and the bottom. Under the copy (narrow screens) the active stage sits at its top and the
+      // ring bleeds off the bottom. The needle, the active numeral and the picture in the middle are always on screen.
+      const copyR = copyEl.getBoundingClientRect();
+      const pinnedTop = navH; // where the hero's pinned area starts
+      const shift = pinnedTop - stickR.top; // copy and slot rects, as they will be once pinned
+      const side = vw >= 1024;
+      let R: number;
+      let cx: number;
+      let cy: number;
+      if (side) {
+        const left = copyR.right + 28;
+        R = clamp(Math.min(0.625 * vh, (vw - left - 16) / 1.56), 150, 2000);
+        cx = left + R;
+        cy = pinnedTop + stickR.height / 2;
+      } else {
+        const below = copyR.bottom + shift + 18;
+        R = clamp((vh - below - 8) / 1.64, 110, 0.625 * vh);
+        cx = vw / 2;
+        cy = below + R;
+      }
+      s.side = side;
+      hs = (2 * R * 210) / 204;
+      x = cx - hs / 2;
+      y = cy - hs / 2;
       const ds = phone ? 40 : 96;
       const dx = vw - ds - (phone ? 10 : 24);
       const dy = phone ? (navH - ds) / 2 : vh - ds - 24;
@@ -163,15 +192,25 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
       if (finalR && u > 0) {
         const fs = Math.min(finalR.width, finalR.height);
         const e2 = ease(u);
+        e2v = e2;
         x = lerp(x, finalR.left + (finalR.width - fs) / 2, e2);
         y = lerp(y, finalR.top + (finalR.height - fs) / 2, e2);
         size = lerp(size, fs, e2);
       }
+      e1v = e1;
       next = u >= 0.999 ? 'final' : u > 0 || (d > 0 && d < 1) ? 'transit' : d >= 1 ? 'dock' : 'hero';
       if (splitR) s.dockTarget = splitR.top >= vh * 0.8 ? N - 1 : sectionRef.current;
       target = u > 0.35 ? N - 1 : d === 0 ? p * (N - 1) : s.dockTarget;
     }
     s.pinned = !reducedNow;
+
+    // The active stage sits at the left of the dial in the side layout, and turns to the top as the dial docks.
+    const orient = reducedNow || !s.side ? 0 : -90 * (1 - Math.max(e1v, e2v));
+    if (orient !== s.orient) {
+      s.orient = orient;
+      orientG.current?.setAttribute('transform', `rotate(${orient.toFixed(2)})`);
+      glyphs.current.forEach((g) => g?.setAttribute('transform', `rotate(${(-orient).toFixed(2)} 0 ${-NUMERAL_R})`));
+    }
 
     // Position and size: one transform on one element.
     const transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${(size / BASE).toFixed(4)})`;
@@ -402,6 +441,7 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
       >
         <title>{mode === 'dock' ? `Stage ${stage + 1}: ${name}. Back to the top` : `Stage ${stage + 1}: ${name}`}</title>
         <circle r="204" className="dial__rim" />
+        <g ref={orientG}>
         <g ref={slow} className="dial__slow">
           {Array.from({ length: 96 }, (_, k) => (
             <line key={k} x1="0" y1="-197" x2="0" y2={k % 8 === 0 ? -190 : -194} transform={`rotate(${k * 3.75})`} className="dial__tick" />
@@ -418,7 +458,7 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
                 <g transform={`rotate(${i * STEP})`} data-stage={i} onPointerEnter={(e) => e.pointerType === 'mouse' && showHint(i, 1600)} onPointerLeave={(e) => e.pointerType === 'mouse' && setHint(null)}>
                   <title>{`${roman(i + 1)}. ${s}: ${STAGE_TEXT[s]}`}</title>
                   <circle cx="0" cy={-NUMERAL_R} r="19" className="dial__hit" />
-                  <text x="0" y={-NUMERAL_R} className={`dial__glyph${i === stage ? ' is-active' : ''}`} textAnchor="middle" dominantBaseline="central">
+                  <text ref={(t) => { glyphs.current[i] = t; }} x="0" y={-NUMERAL_R} className={`dial__glyph${i === stage ? ' is-active' : ''}`} textAnchor="middle" dominantBaseline="central">
                     {roman(i + 1)}
                   </text>
                   {liveIndex === i && <circle cx="0" cy="-156" r="4" className="dial__live" />}
@@ -429,6 +469,7 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
         </g>
         <circle ref={flash} cx="0" cy={-NUMERAL_R} r="22" className="dial__flash" />
         <path ref={needle} d="M0 -188 L-9 -209 H9 Z" className="dial__needle" />
+        </g>
         <g className="dial__scene">
           <DialScene stage={stage} data={data} />
         </g>
@@ -448,7 +489,7 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
     <>
       <section ref={hero} className={`hero ${reduced ? 'hero--static' : 'hero--pinned'}`} aria-label="The eight stages of a tender">
         <div ref={stick} className="hero__stick container">
-          <div className="hero__copy">
+          <div ref={copy} className="hero__copy">
             <p className="eyebrow">
               {live && liveIndex !== null
                 ? `Live: tender ${live.id.toString()} is at stage ${liveIndex + 1}, ${live.phase}`
