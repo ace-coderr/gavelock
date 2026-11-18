@@ -161,3 +161,46 @@ check below was run in a real browser (the built site served from localhost) unl
   exercised with sample content in a throw-away page that was not committed; with real data they are first seen
   after the contracts are deployed.
 - **Frame-level contrast of the glass** and decorative hairlines were not measured; text on them is above 15:1.
+
+# Audit of the wheel rework (18 November 2026)
+
+The two wheels became one: a single fixed dial that is large in the pinned hero, docks as a small dial while
+the reader scrolls, and returns to full size above the footer, in its final state with the lock open. It has a
+fixed needle, a spring with friction, a tick at every stage, momentum after a drag, and a picture inside for each
+stage. The two inline headline pictures were replaced and the footer was rewritten.
+
+## Found and fixed during the rework
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | The hero must sit below the sticky navbar. | The hero's pinned area is exactly the viewport minus the navbar (`100svh - nav`); the dial is placed from the measured slot, not from guesses. Measured fits below. |
+| 2 | On a phone the dial was cut off by the screen edge because the copy was too tall. | The phone copy is compact (no big numeral, shorter controls); the dial now fits whole. |
+| 3 | On a tablet in portrait the two-column hero left a dial about 170 px wide. | Up to 1023 px the copy sits above the dial, which keeps its size. |
+| 4 | At the end of the page the footer pushed the final dial partly above the screen, and the dial overlapped the navbar links. | The final slot is sized from the viewport so the whole dial is visible when the page ends (checked at 1366 by 768 and 375 by 667); the dial sits under the navbar except while docked. |
+| 5 | The docked dial on a phone would cover content. | On a phone it docks inside the navbar, which reserves room for it, so it covers nothing. On wider screens it docks bottom right. |
+| 6 | The first stage picture sampled every 16th outcome, so it drew stripes. | The sample steps through different input bits, so it shows a real spread of outcomes. |
+| 7 | New colours (captions, hints, footer text) were not in the contrast check. | Six pairs added to `web/scripts/contrast.mjs`; all 23 pairs pass (lowest 5.10:1). |
+
+## Verified
+
+| Check | Result |
+|---|---|
+| Hero below the navbar, dial whole | Checked by measuring and with screenshots at 1920x1080, 1440x900, 1366x768, 768x1024 and 375x667. No horizontal scroll at any of them. |
+| One wheel | One `.dial` element in the page; the old compact wheel and its component are deleted. It moves hero, dock, final by one scroll-driven transform; scrolling back reverses it. Clicking the docked dial scrolls to the top. |
+| Keyboard | The dial is a slider in the hero: Right/Down and Left/Up step one stage, Home/End jump. Three Right presses went from stage 1 to 4 and two Left presses back to 2. Docked, it is a button (Enter or Space returns to the top). In the final slot it is a labelled image. The Back, Next stage and Sound buttons are ordinary tab stops. |
+| Reduced motion | The hero is not pinned, there is no docking and nothing animates (the pictures show their finished state). The dial sits in the hero, then in the final slot, and is hidden in between. Back/Next turned it: three Next presses reached stage 4, one Left press stage 3. |
+| Frame rate (desktop) | With the browser pane visible, scrolling the whole pinned hero (180 scroll steps in 3 s) gave 180 frames, average 16.7 ms, slowest 16.9 ms, none over 20 ms. |
+| Sound | Off by default. The audio context is created only by the click on the Sound button; nothing plays on load. |
+| Bundle | 998,839 bytes in 7 files, under 1 MB (but with little room left). |
+| External origins | None in `index.html` or the CSS. No fonts, scripts or images from another origin. The footer's repository and explorer links are ordinary links, not loaded resources. |
+| Typecheck, tests | Typecheck passes; 11 web tests pass. |
+| Footer | Product name, one line, How it works / Rules / Verify, repository, explorer links to the three contracts once deployed (until then it says they are not deployed), and the limits note. No builder byline anywhere in the site, README or submission document. |
+
+## Not verified
+
+- **Frame rate on a phone.** Measured only on this desktop. The per-frame work is one transform write, two attribute writes and a few rect reads; but a mid-range phone was not tried.
+- **Real touch.** Drag with a finger, the momentum after a flick and a tap on a numeral use pointer events with `touch-action: pan-y` on the dial; they were exercised here with a mouse only.
+- **Sound.** The tick and thud are synthesised; they were built but not heard in this session.
+- **Live data.** With no tender on chain the dial says it is an explainer. Its live marker (a dot on the stage of the newest tender) is first seen after the contracts are deployed.
+- **The stage pictures in motion on every size.** Each was seen at desktop size (stage VI, the lock, the first stage) and the phone size (first and final stage); the quick scroll through all eight at phone size was not recorded.
+- **Hint bubble on a phone.** The numeral hint appears on tap; it was not captured in a screenshot on a phone.

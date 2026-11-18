@@ -1196,3 +1196,36 @@
     min-height: 2.5rem;
   }
 }
+
+@media (max-width: 47.9rem) {
+  .wheel-final {
+    --final-size: clamp(9rem, calc(100vh - var(--nav-height) - 25rem), 20rem);
+    --final-size: clamp(9rem, calc(100svh - var(--nav-height) - 25rem), 20rem);
+    padding-block: var(--space-4) var(--space-3);
+  }
+
+  .wheel-final__text,
+  .footer__about p:last-child {
+    display: none;
+  }
+
+  .footer {
+    padding-block: var(--space-4) var(--space-3);
+  }
+
+  .footer__limits {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+  }
+}
+
+/* Tablets in portrait: copy above, dial below, so the dial keeps its size. */
+@media (max-width: 63.9rem) {
+  .hero__stick {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: start;
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-3);
+  }
+}

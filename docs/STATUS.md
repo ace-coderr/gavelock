@@ -90,6 +90,10 @@ The TypeScript in `packages/core` is the specification; contract tests compare t
 - **Lean Gate B** (docs/GATE-B-LEAN.md): one rule, 0.001 OKB tender fee, 2 demo bidders, about 0.025 OKB plus 0.12 BEM. Rehearsed on the fork. Other rules later with `scripts/add-rules.ts`. Nothing sent to mainnet; no deploy key.
 - **UI pass**: warm dark theme (tokens in `web/src/styles/tokens.css`), Instrument Serif and Inter (Latin, local), pinned stage wheel, sticky split sections, glass over the bids, receipts, chips and switches, panel seats, drag rows. Audited in docs/AUDIT.md (10 fixes). Site is 970,824 bytes. Open: frame rate and real-touch checks.
 
+## Wheel rework (18 November)
+
+- One continuous dial from hero to footer (`web/src/components/LandingWheel.tsx`, scenes in `DialScenes.tsx`), replacing both wheels; new headline pictures (`HeadlinePics.tsx`); rewritten footer, builder byline removed everywhere. Audit in docs/AUDIT.md. Bundle 998,839 bytes (little room left). Open: phone frame rate, real-touch check, sound heard.
+
 ## What exists
 
 - Root npm workspaces: `packages/core` (chain constants, deployment record, drand rounds, rule layout / form / NAND compiler / netlist codec and simulator, bid encoding and commitment, banding, reference award, time-lock sealing; 60 tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.
