@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from '../lib/router.tsx';
 import { DEPLOYMENT, STARTER_RULES, isDeployed, latestRoundAt, truthTable } from '@gavelock/core';
-import { InlinePic, RuleGridPic, SealPic } from '../components/Pictures.tsx';
+import { HeadlinePic, LockPic, RuleMiniPic } from '../components/HeadlinePics.tsx';
+import { LandingWheel, WheelFinalSlot } from '../components/LandingWheel.tsx';
+import { RuleGridPic, SealPic } from '../components/Pictures.tsx';
 import { NetworkPanel } from '../components/NetworkPanel.tsx';
 import { Reveal } from '../components/Reveal.tsx';
 import { NumberCard } from '../components/Receipt.tsx';
 import { SplitSection, type SplitRow } from '../components/SplitSection.tsx';
-import { StageWheel } from '../components/StageWheel.tsx';
 import { TenderList } from '../components/TenderList.tsx';
 import { formatInteger } from '../lib/format.ts';
 import { STAGES, STAGE_TEXT } from '../lib/stages.ts';
@@ -23,6 +24,7 @@ export function Board() {
   const tender = latest.data?.items[0] ?? null;
   // The current drand round, from the clock: a real value that changes every three seconds.
   const round = useMemo(() => latestRoundAt(Math.floor(Date.now() / 1000)), []);
+  const [sectionStage, setSectionStage] = useState(0);
 
   const details: Record<(typeof STAGES)[number], React.ReactNode> = {
     Published: <p>The buyer posts the documents, the checklist, the scoring rule and the dates. Each document is stored on chain with its SHA-256.</p>,
@@ -54,7 +56,7 @@ export function Board() {
 
   return (
     <>
-      <StageWheel mode="pinned" live={tender ? { id: tender.id, phase: tender.phase } : null} />
+      <LandingWheel live={tender ? { id: tender.id, phase: tender.phase } : null} sectionStage={sectionStage} data={{ words: explainerWords as number[], round }} />
 
       <section className="band" aria-labelledby="run-title">
         <div className="container">
@@ -81,6 +83,7 @@ export function Board() {
               )
             }
             rows={rows}
+            onActive={setSectionStage}
           />
         </div>
       </section>
@@ -88,20 +91,20 @@ export function Board() {
       <section className="band" aria-labelledby="pics-title">
         <div className="container stack">
           <Reveal as="h2" className="display band__title">
-            <span id="pics-title" style={{ fontSize: 'var(--text-3xl)', lineHeight: 'var(--leading-tight)', display: 'block', maxWidth: '16ch' }}>
+            <span id="pics-title" style={{ fontSize: 'var(--text-3xl)', lineHeight: 1.3, display: 'block', maxWidth: '18ch' }}>
               A sealed
-              <InlinePic>
-                <SealPic seed={round} label="A seal drawn from the current drand round" />
-              </InlinePic>{' '}
+              <HeadlinePic caption="Locked with a time-lock until the deadline.">
+                <LockPic />
+              </HeadlinePic>{' '}
               bid, a public
-              <InlinePic>
-                <RuleGridPic words={explainerWords} label="All 2,048 outcomes of a rule" />
-              </InlinePic>{' '}
+              <HeadlinePic caption="Anyone can see every outcome.">
+                <RuleMiniPic words={explainerWords} />
+              </HeadlinePic>{' '}
               rule, a result <em>anyone can check.</em>
             </span>
           </Reveal>
           <Reveal as="p" className="lede">
-            Both pictures are drawn from real values: the seal from the current drand round, the grid from every outcome of a rule.
+            Both pictures play from real values: the rows come from every outcome of a rule, computed in your browser, and the dial above is drawn from the same rule and the current drand round.
           </Reveal>
           {tender ? (
             <div className="floats">
@@ -135,7 +138,7 @@ export function Board() {
         </div>
       </section>
 
-      <StageWheel mode="compact" live={tender ? { id: tender.id, phase: tender.phase } : null} />
+      <WheelFinalSlot />
     </>
   );
 }

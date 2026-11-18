@@ -477,42 +477,76 @@ a {
 
 /* ---- footer */
 .footer {
+  margin-top: var(--space-4);
   border-top: var(--border-width) solid var(--color-border);
-  padding-block: var(--space-5);
-  color: var(--color-text-faint);
+  padding-block: var(--space-6) var(--space-4);
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
 
-.footer__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3) var(--space-5);
+.footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
 }
 
-.footer__credit {
-  display: inline-flex;
-  align-items: center;
+.footer__about p {
+  max-width: 28rem;
+}
+
+.footer__name {
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--text-xl);
+}
+
+.footer__col {
+  display: grid;
+  align-content: start;
   gap: var(--space-2);
 }
 
-.footer__pill {
-  display: inline-block;
-  padding: 0 var(--space-2);
-  border: var(--border-width) solid var(--color-border-strong);
-  border-radius: var(--radius-pill);
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  text-decoration: none;
-  transition:
-    color var(--motion-fast) var(--ease-out),
-    border-color var(--motion-fast) var(--ease-out);
+.footer__head {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-faint);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
 }
 
-.footer__pill:hover {
-  color: var(--color-white);
-  border-color: var(--color-white);
+.footer a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.footer a:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.footer__limits {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
+  color: var(--color-text-faint);
+  font-size: var(--text-xs);
+}
+
+.footer__limits p {
+  max-width: 60rem;
+}
+
+@media (max-width: 47.9rem) {
+  .footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer__about {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 30rem) {

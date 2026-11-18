@@ -4,6 +4,7 @@ import './fonts/fonts.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/motion.css';
+import './styles/wheel.css';
 import { App } from './App.tsx';
 import { WalletProvider } from './lib/wallet.tsx';
 

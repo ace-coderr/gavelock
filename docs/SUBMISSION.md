@@ -5,7 +5,6 @@ first bid, and the award computed by a public circuit on TapeOut instead of chos
 
 - Live site: https://ace-coderr.github.io/gavelock/
 - Source (MIT): https://github.com/ace-coderr/gavelock
-- Built by ace: https://x.com/_ace_won
 
 ## Deployment status (17 November 2026)
 

@@ -38,6 +38,12 @@ const pairs = [
   ['color-warn', 'color-bg', 4.5, 'status text'],
   ['color-danger', 'color-bg', 4.5, 'error text'],
   ['color-text', 'color-bg-deep', 4.5, 'text on the glass'],
+  ['color-text-inverse', 'color-accent', 4.5, 'score numbers on the lit dial seats'],
+  ['color-text-muted', 'color-bg-deep', 4.5, 'dial captions'],
+  ['color-text-faint', 'color-bg-deep', 4.5, 'dial hints'],
+  ['color-accent', 'color-bg-deep', 4.5, 'dial numerals and receipts text'],
+  ['color-text-muted', 'color-surface', 4.5, 'footer text and links'],
+  ['color-text-faint', 'color-bg', 4.5, 'footer limits note'],
   ['color-focus', 'color-bg', 3, 'focus outline'],
 ];
 let failed = 0;

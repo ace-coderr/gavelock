@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useReveal } from '../lib/motion.ts';
 
 /** Eight bits per byte of a hex string or number, as a flat list of 0..15 nibbles. */
 function nibbles(seed: string | number): number[] {
@@ -59,7 +60,3 @@ export function RuleGridPic({ words, label, scale = 1 }: { words: readonly (numb
   return <canvas ref={ref} width={GRID_W} height={GRID_H} role="img" aria-label={label} style={{ width: '100%', height: '100%', imageRendering: 'pixelated', display: 'block', minWidth: scale > 1 ? `${GRID_W * scale}px` : undefined }} />;
 }
 
-/** A picture set inside a line of a headline. */
-export function InlinePic({ children }: { children: React.ReactNode }) {
-  return <span className="inpic">{children}</span>;
-}
