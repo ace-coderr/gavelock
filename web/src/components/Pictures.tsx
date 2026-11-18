@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useReveal } from '../lib/motion.ts';
 
 /** Eight bits per byte of a hex string or number, as a flat list of 0..15 nibbles. */
-function nibbles(seed: string | number): number[] {
+export function nibbles(seed: string | number): number[] {
   const hex = typeof seed === 'number' ? seed.toString(16) : seed.replace(/^0x/, '');
   return Array.from(hex.padStart(32, '0')).map((c) => parseInt(c, 16) || 0);
 }

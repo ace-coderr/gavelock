@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getAddress, parseAbi } from 'viem';
+import { getAddress } from 'viem';
 import { TAPEOUT } from '@gavelock/core';
 import { publicClient } from './client.ts';
 
-const abi = parseAbi([
-  'function cpuCount() view returns (uint256)',
-  'function implementation() view returns (address)',
-  'function owner() view returns (address)',
-]);
+const abi = [
+  { type: 'function', name: 'cpuCount', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+  { type: 'function', name: 'implementation', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'address' }] },
+  { type: 'function', name: 'owner', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'address' }] },
+] as const;
 
 export interface NetworkSnapshot {
   blockNumber: bigint;

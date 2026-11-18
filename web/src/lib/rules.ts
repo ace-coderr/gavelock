@@ -1,12 +1,23 @@
 // Reading rule circuits from the chain: the whole truth table, one multicall batch at a time.
-import { bytesToHex, encodeFunctionData, parseAbi, type Address, type Hex } from 'viem';
+import { bytesToHex, encodeFunctionData, type Address, type Hex } from 'viem';
 import { DEPLOYMENT, INPUT_SPACE, RPC_LIMITS, inputToBytes, isDeployed, ruleStockAbi } from '@gavelock/core';
 import { publicClient } from './client.ts';
 
-const circuitsAbi = parseAbi([
-  'function eval(uint256 id, bytes inputs) view returns (bytes)',
-  'function circuitInfo(uint256 id) view returns (uint32 nIn, uint32 nOut, uint32 nState, uint32 gateCount)',
-]);
+// Written out as JSON: viem's text-ABI parser is bigger than every ABI fragment the app needs.
+const circuitsAbi = [
+  { type: 'function', name: 'eval', stateMutability: 'view', inputs: [{ name: 'id', type: 'uint256' }, { name: 'inputs', type: 'bytes' }], outputs: [{ name: '', type: 'bytes' }] },
+  { type: 'function', name: 'circuitInfo', stateMutability: 'view', inputs: [{ name: 'id', type: 'uint256' }], outputs: [{ name: 'nIn', type: 'uint32' }, { name: 'nOut', type: 'uint32' }, { name: 'nState', type: 'uint32' }, { name: 'gateCount', type: 'uint32' }] },
+] as const;
+
+const multicallAbi = [
+  {
+    type: 'function',
+    name: 'aggregate3',
+    stateMutability: 'payable',
+    inputs: [{ name: 'calls', type: 'tuple[]', components: [{ name: 'target', type: 'address' }, { name: 'allowFailure', type: 'bool' }, { name: 'callData', type: 'bytes' }] }],
+    outputs: [{ name: '', type: 'tuple[]', components: [{ name: 'success', type: 'bool' }, { name: 'returnData', type: 'bytes' }] }],
+  },
+] as const;
 
 export interface OnChainRule {
   id: number;
@@ -59,7 +70,7 @@ export async function readTruthTable(processor: Address, circuitId: number, onPr
     }));
     const results = await publicClient.readContract({
       address: '0xcA11bde05977b3631167028862bE2a173976CA11',
-      abi: parseAbi(['function aggregate3((address target, bool allowFailure, bytes callData)[] calls) payable returns ((bool success, bytes returnData)[])']),
+      abi: multicallAbi,
       functionName: 'aggregate3',
       args: [calls],
       gas: BigInt(RPC_LIMITS.callGasCap),

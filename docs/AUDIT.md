@@ -204,3 +204,33 @@ stage. The two inline headline pictures were replaced and the footer was rewritt
 - **Live data.** With no tender on chain the dial says it is an explainer. Its live marker (a dot on the stage of the newest tender) is first seen after the contracts are deployed.
 - **The stage pictures in motion on every size.** Each was seen at desktop size (stage VI, the lock, the first stage) and the phone size (first and final stage); the quick scroll through all eight at phone size was not recorded.
 - **Hint bubble on a phone.** The numeral hint appears on tap; it was not captured in a screenshot on a phone.
+
+# Bundle reduction attempt (18 November 2026)
+
+Goal: under 700 KB without removing a feature. **Not reached.** Before and after, in bytes:
+
+| | Before | After |
+|---|---|---|
+| Whole `dist` | 998,839 | 999,655 |
+| Loaded on first visit (HTML, CSS, fonts, main script) | 838,136 | 838,136 |
+| Main script | 712,622 | 712,421 |
+| Seal chunk (time-lock code, loaded when a bid is sealed or opened) | 156,481 | 156,481 |
+| Fonts (Inter 48,256; Instrument Serif 21,032 and 22,128) | 91,416 | 91,416 |
+| CSS | 33,311 | 33,311 |
+
+What was measured: bytes by package in the main script are viem 214 KB, react-dom 207 KB, the app and the
+shared core about 130 KB, ox 38 KB (inside viem), noble curves 25 KB, abitype 14 KB. The seal chunk is mostly
+noble curves (62 KB), a Buffer shim (25 KB) and tlock-js and its drand client (30 KB).
+
+What was done: viem's text-ABI parser was replaced by JSON ABIs; the dial's sound code is now a separate chunk fetched
+the first time Sound is switched on (checked: not requested before the click, requested after); the duplicate
+digit helper in the dial scenes was removed; the unused `@fontsource-variable/inter` dependency (the font files
+are local copies) was removed. These save about 200 bytes in the main script, because viem still ships the
+parser for its own use. The fonts cannot shrink further without a font tool: both are already Latin-only and the
+site uses only weights 400, 500 and 600 of Inter, but Inter is one variable file that cannot be cut by weight
+without fonttools, which is not installed.
+
+What would be needed: React's DOM library alone is 207 KB. Swapping it for Preact (about 13 KB, same hooks and
+components through a compatibility alias) would save roughly 190 KB, but it adds two new packages, so it needs
+the owner's approval; even then the total is about 810 KB, so 700 KB would also need viem replaced by a small
+hand-written client for the dozen calls the app makes. Neither was done.

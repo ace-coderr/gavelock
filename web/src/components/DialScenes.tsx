@@ -1,13 +1,10 @@
 import { STAGE_TEXT } from '../lib/stages.ts';
+import { nibbles } from './Pictures.tsx';
 
 /** Real values the stage pictures are drawn from: every outcome of a rule, and the current drand round. */
 export interface DialData {
   words: readonly number[];
   round: number;
-}
-
-function nibbles(n: number): number[] {
-  return Array.from(n.toString(16).padStart(32, '0')).map((c) => parseInt(c, 16) || 0);
 }
 
 const eligible = (w: number) => (w & 1) === 1;

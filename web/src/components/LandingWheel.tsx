@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { roman, useReducedMotion } from '../lib/motion.ts';
-import { playThud, playTick, setSound, soundOn } from '../lib/sound.ts';
 import { STAGES, STAGE_TEXT, stageIndex } from '../lib/stages.ts';
 import type { PhaseName } from '../lib/tenders.ts';
 import { DialScene, type DialData } from './DialScenes.tsx';
+
+// The sound module is fetched the first time the visitor switches sound on; until then it costs nothing.
+type SoundModule = typeof import('../lib/sound.ts');
+let sound: SoundModule | null = null;
 
 const N = STAGES.length;
 const STEP = 360 / N;
@@ -209,8 +212,8 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
       s.shown = shown;
       setStage(shown);
       kick();
-      playTick();
-      if (shown === 5) playThud();
+      sound?.playTick();
+      if (shown === 5) sound?.playThud();
     }
     if (s.vel !== 0 || s.cur !== goal || scrolling) s.raf = requestAnimationFrame(frame);
   }, [kick]);
@@ -477,7 +480,10 @@ export function LandingWheel({ live, sectionStage, data }: { live?: LiveStage | 
                 type="button"
                 className="button wheel__sound"
                 aria-pressed={soundState}
-                onClick={() => setSoundState(setSound(!soundOn()))}
+                onClick={async () => {
+                  sound ??= await import('../lib/sound.ts');
+                  setSoundState(sound.setSound(!sound.soundOn()));
+                }}
                 title="A soft tick at every stage and a thud for the gavel. Off by default."
               >
                 Sound {soundState ? 'on' : 'off'}
