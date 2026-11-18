@@ -277,3 +277,25 @@ hand-written client for the dozen calls the app makes. Neither was done.
   are measured from the page.
 - Keyboard and reduced motion were not repeated after this change.
 - Nothing was run on a real phone.
+
+## React replaced by Preact (18 November 2026, approved by the owner)
+
+The components are unchanged: they still import from `react`, and the Vite preset maps that to Preact's React-compatibility layer.
+`react`, `react-dom` and `@vitejs/plugin-react` were removed; `preact` and `@preact/preset-vite` were added.
+
+| | Before | After |
+|---|---|---|
+| Whole `dist` | 1,000,458 | 787,130 |
+| Loaded on first visit (HTML, CSS, fonts, main script) | 838,939 | 625,611 |
+| Main script | 712,421 | 500,449 |
+
+The first-visit load is now under 700 KB; the whole `dist` (which includes the time-lock chunk fetched only when a bid is
+sealed or opened) is 787 KB, so the 700 KB goal is met for what a visitor loads but not for the whole folder. Reaching it for the
+whole folder would need viem replaced as well (viem is 214 KB of the main script).
+
+Checked after the swap: typecheck and the 11 web tests pass; every route renders without a script error (home, new tender, rules,
+rule page, verify, docs, tender, supplier, buyer, not found); on the home page three Right presses on the dial went from stage 1
+to 4 and two Left presses back to 2, the page docked the dial into the navbar on a narrow viewport and the final slot took it back
+(the pane does not deliver scroll events or animation frames while hidden, so scroll events were fired by hand); the split list responds
+to click and hover; the sound toggle fetches its chunk on first click; the new-tender form takes typing and its switch toggles. Not checked: the
+frosted-glass wipe and the panel seats (they need a tender on chain), a drag with the mouse, frame rate after the swap, and a real phone.

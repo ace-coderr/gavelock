@@ -100,7 +100,7 @@ The TypeScript in `packages/core` is the specification; contract tests compare t
 
 ## What exists
 
-- Root npm workspaces: `packages/core` (chain constants, deployment record, drand rounds, rule layout / form / NAND compiler / netlist codec and simulator, bid encoding and commitment, banding, reference award, time-lock sealing; 60 tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React + Vite shell, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.
+- Root npm workspaces: `packages/core` (chain constants, deployment record, drand rounds, rule layout / form / NAND compiler / netlist codec and simulator, bid encoding and commitment, banding, reference award, time-lock sealing; 60 tests), `packages/contracts` (Hardhat 3 fork config, TapeOut interfaces, fork smoke test: `npm run test:fork`), `web` (React-compatible components on Preact, with Vite; hash routing, hash routing, tokens in `web/src/styles/tokens.css`, Tender Board with live X Layer facts, How it works page). `packages/mcp` is created in Task 5.
 - Commands: `npm run typecheck`, `npm test`, `npm run build`, `npm run dev`, `npm run test:fork`.
 - `spike/`: read-only mainnet checks, a Hardhat fork cost script, a probe contract, the tlock checks. Raw results in `spike/out/`. Standalone, not part of the workspaces.
 - `docs/PROTOCOL.md`: verified addresses, interfaces, limits, costs, trust boundaries, plan changes.

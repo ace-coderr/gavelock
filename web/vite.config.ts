@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import preact from '@preact/preset-vite';
 
 // Relative base: the same build works at ace-coderr.github.io/gavelock/, at a site root, and from an
 // on-chain container. Routing is hash-based for the same reason, so no server rewrites are needed.
 export default defineConfig({
   base: './',
-  plugins: [react()],
+  plugins: [preact()],
   build: {
     target: 'es2022',
     sourcemap: false,
